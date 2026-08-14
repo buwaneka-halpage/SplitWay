@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 type ExpenseFormState = {
   amount: string
+  description: string
   paidBy: string
   participantIds: string[]
   splitType: SplitType
@@ -21,6 +22,7 @@ type ExpenseFormState = {
 function emptyForm(): ExpenseFormState {
   return {
     amount: "",
+    description: "",
     paidBy: "",
     participantIds: [],
     splitType: "equal",
@@ -97,12 +99,14 @@ export function ExpensesPanel() {
       }
     }
 
+    const description = form.description.trim()
     const expense: Expense = {
       id: editingId ?? newId(),
       amountCents,
       paidBy: form.paidBy,
       participantIds: [...form.participantIds],
       splitType: form.splitType,
+      ...(description ? { description } : {}),
       ...(exactCents ? { exactCents } : {}),
     }
 
@@ -136,6 +140,20 @@ export function ExpensesPanel() {
             data-testid="expense-amount"
             onChange={(event) =>
               setForm((current) => ({ ...current, amount: event.target.value }))
+            }
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="expense-description">Description</Label>
+          <Input
+            id="expense-description"
+            className={fieldClass}
+            value={form.description}
+            placeholder="Dinner, hotel, fuel…"
+            autoComplete="off"
+            data-testid="expense-description"
+            onChange={(event) =>
+              setForm((current) => ({ ...current, description: event.target.value }))
             }
           />
         </div>
@@ -268,7 +286,12 @@ export function ExpensesPanel() {
               <Card size="sm">
                 <CardContent className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-medium">
+                    {expense.description ? (
+                      <p className="font-medium" data-testid={`expense-desc-${expense.id}`}>
+                        {expense.description}
+                      </p>
+                    ) : null}
+                    <p className={expense.description ? "text-muted-foreground" : "font-medium"}>
                       {formatLkr(expense.amountCents)} paid by{" "}
                       {personName(group.people, expense.paidBy)} ({expense.splitType})
                     </p>

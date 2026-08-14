@@ -37,6 +37,7 @@ export function parseCents(raw: string, allowZero: boolean): number | null {
 
 export function formFromExpense(expense: Expense): {
   amount: string
+  description: string
   paidBy: string
   participantIds: string[]
   splitType: Expense["splitType"]
@@ -50,6 +51,7 @@ export function formFromExpense(expense: Expense): {
   }
   return {
     amount: centsToInput(expense.amountCents),
+    description: expense.description ?? "",
     paidBy: expense.paidBy,
     participantIds: [...expense.participantIds],
     splitType: expense.splitType,

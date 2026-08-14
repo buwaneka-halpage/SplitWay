@@ -59,4 +59,25 @@ describe("groups store (in-memory)", () => {
     assert.equal(loadGroups().length, 1)
     assert.equal(loadGroups()[0].name, "House")
   })
+
+  it("round-trips an expense description", () => {
+    saveGroups([
+      {
+        id: "g1",
+        name: "Trip",
+        people: [{ id: "a", name: "Ann" }],
+        expenses: [
+          {
+            id: "e1",
+            amountCents: 10_000,
+            paidBy: "a",
+            participantIds: ["a"],
+            splitType: "equal",
+            description: "Dinner",
+          },
+        ],
+      },
+    ])
+    assert.equal(loadGroup("g1")?.expenses[0].description, "Dinner")
+  })
 })

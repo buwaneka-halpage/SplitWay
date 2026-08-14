@@ -10,6 +10,7 @@ export type Expense = {
   paidBy: PersonId
   participantIds: PersonId[]
   splitType: SplitType
+  description?: string
   exactCents?: Record<PersonId, number>
 }
 
