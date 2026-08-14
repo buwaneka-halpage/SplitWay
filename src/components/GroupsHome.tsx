@@ -14,6 +14,7 @@ import {
   type Group,
 } from "@/lib"
 import { newId } from "@/lib/form"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -129,7 +130,7 @@ export function GroupsHome() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-8 pt-2 md:mx-auto md:w-full md:max-w-5xl md:px-8 md:py-10">
-      <header className="flex flex-col gap-1 pt-2 md:flex-row md:items-end md:justify-between md:pt-0">
+      <header className="flex items-start justify-between gap-3 pt-2 md:pt-0">
         <div>
           <p className="text-xs font-medium tracking-wide text-primary uppercase">LKR splitter</p>
           <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">SplitWay</h1>
@@ -138,7 +139,7 @@ export function GroupsHome() {
             <span className="hidden md:inline">Groups stay in this browser. No login.</span>
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 pt-3 md:pt-0">
+        <div className="flex flex-wrap items-center justify-end gap-2">
           <Button
             type="button"
             variant="outline"
@@ -155,6 +156,7 @@ export function GroupsHome() {
             className="max-w-full text-sm text-muted-foreground file:mr-2 file:rounded-lg file:border file:border-border file:bg-background file:px-2.5 file:py-1 file:text-sm file:font-medium file:text-foreground"
             onChange={importGroups}
           />
+          <ThemeToggle testId="theme-toggle" />
         </div>
       </header>
 
