@@ -2,39 +2,78 @@
 
 import { useState, type FormEvent } from "react"
 import Link from "next/link"
-import { exactShares, formatLkr, type Expense, type SplitType } from "@/lib"
-import { formFromExpense, newId, parseCents, personName } from "@/lib/form"
+import { exactShares, formatLkr, type Expense, type Group, type SplitType } from "@/lib"
+import { formFromExpense, newId, parseCents, personName, todayDate } from "@/lib/form"
 import { useGroup } from "@/components/GroupShell"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 
 type ExpenseFormState = {
   amount: string
   description: string
+  date: string
   paidBy: string
   participantIds: string[]
   splitType: SplitType
   exactAmounts: Record<string, string>
 }
 
-function emptyForm(): ExpenseFormState {
+function emptyForm(
+  group: Group,
+  last?: { lastPaidBy?: string; lastParticipantIds?: string[] },
+): ExpenseFormState {
+  const ids = new Set(group.people.map((person) => person.id))
+  const lastPaidBy = last?.lastPaidBy ?? group.lastPaidBy
+  const lastParticipantIds = last?.lastParticipantIds ?? group.lastParticipantIds
   return {
     amount: "",
     description: "",
-    paidBy: "",
-    participantIds: [],
+    date: todayDate(),
+    paidBy: lastPaidBy && ids.has(lastPaidBy) ? lastPaidBy : "",
+    participantIds: (lastParticipantIds ?? []).filter((id) => ids.has(id)),
     splitType: "equal",
     exactAmounts: {},
   }
+}
+
+function exactRemainderText(
+  amount: string,
+  participantIds: string[],
+  exactAmounts: Record<string, string>,
+): string | null {
+  if (participantIds.length === 0) return null
+  const amountCents = parseCents(amount, false)
+  if (amountCents === null) return null
+  let sum = 0
+  for (const id of participantIds) {
+    const share = parseCents(exactAmounts[id] ?? "", true)
+    if (share === null) return null
+    sum += share
+  }
+  const remainder = amountCents - sum
+  if (remainder > 0) return `${formatLkr(remainder)} left to assign`
+  if (remainder < 0) return `${formatLkr(-remainder)} over`
+  return "Amounts sum to the total"
 }
 
 const fieldClass = "h-11 text-base md:h-9 md:text-sm"
 
 export function ExpensesPanel() {
   const { group, commit } = useGroup()
-  const [form, setForm] = useState<ExpenseFormState>(emptyForm)
+  const [form, setForm] = useState<ExpenseFormState>(() => emptyForm(group))
   const [editingId, setEditingId] = useState<string | null>(null)
   const [error, setError] = useState("")
 
@@ -50,8 +89,15 @@ export function ExpensesPanel() {
     })
   }
 
-  function resetExpenseForm() {
-    setForm(emptyForm())
+  function splitAll() {
+    setForm((current) => ({
+      ...current,
+      participantIds: group.people.map((person) => person.id),
+    }))
+  }
+
+  function resetExpenseForm(last?: { lastPaidBy?: string; lastParticipantIds?: string[] }) {
+    setForm(emptyForm(group, last))
     setEditingId(null)
     setError("")
   }
@@ -100,6 +146,7 @@ export function ExpensesPanel() {
     }
 
     const description = form.description.trim()
+    const date = form.date.trim()
     const expense: Expense = {
       id: editingId ?? newId(),
       amountCents,
@@ -107,6 +154,7 @@ export function ExpensesPanel() {
       participantIds: [...form.participantIds],
       splitType: form.splitType,
       ...(description ? { description } : {}),
+      ...(date ? { date } : {}),
       ...(exactCents ? { exactCents } : {}),
     }
 
@@ -114,8 +162,10 @@ export function ExpensesPanel() {
       ? group.expenses.map((item) => (item.id === editingId ? expense : item))
       : [...group.expenses, expense]
 
-    commit({ ...group, expenses })
-    resetExpenseForm()
+    const lastPaidBy = form.paidBy
+    const lastParticipantIds = [...form.participantIds]
+    commit({ ...group, expenses, lastPaidBy, lastParticipantIds })
+    resetExpenseForm({ lastPaidBy, lastParticipantIds })
   }
 
   function deleteExpense(expenseId: string) {
@@ -125,6 +175,10 @@ export function ExpensesPanel() {
     })
     if (editingId === expenseId) resetExpenseForm()
   }
+
+  const remainder = form.splitType === "exact"
+    ? exactRemainderText(form.amount, form.participantIds, form.exactAmounts)
+    : null
 
   return (
     <section className="flex flex-col gap-4 px-4 py-4 md:grid md:grid-cols-[minmax(18rem,22rem)_1fr] md:items-start md:gap-8 md:px-8 md:py-6">
@@ -158,6 +212,19 @@ export function ExpensesPanel() {
           />
         </div>
         <div className="flex flex-col gap-1.5">
+          <Label htmlFor="expense-date">Date</Label>
+          <input
+            id="expense-date"
+            type="date"
+            className={`${fieldClass} rounded-lg border border-input bg-background px-2.5`}
+            value={form.date}
+            data-testid="expense-date"
+            onChange={(event) =>
+              setForm((current) => ({ ...current, date: event.target.value }))
+            }
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
           <Label htmlFor="expense-payer">Payer</Label>
           <select
             id="expense-payer"
@@ -178,6 +245,16 @@ export function ExpensesPanel() {
         </div>
         <fieldset className="flex flex-col gap-2">
           <legend className="text-sm font-medium">Participants</legend>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="self-start"
+            data-testid="split-all"
+            onClick={splitAll}
+          >
+            Split among all
+          </Button>
           {group.people.length === 0 ? (
             <p className="text-sm text-muted-foreground">
               Add people before logging an expense.{" "}
@@ -259,6 +336,11 @@ export function ExpensesPanel() {
                 </div>
               ))
             )}
+            {remainder ? (
+              <p className="text-sm text-muted-foreground" data-testid="exact-remainder">
+                {remainder}
+              </p>
+            ) : null}
           </fieldset>
         )}
         {error ? (
@@ -271,14 +353,31 @@ export function ExpensesPanel() {
             {editingId ? "Save expense" : "Add expense"}
           </Button>
           {editingId ? (
-            <Button className="h-11 md:h-9" variant="outline" type="button" onClick={resetExpenseForm}>
+            <Button className="h-11 md:h-9" variant="outline" type="button" onClick={() => resetExpenseForm()}>
               Cancel
             </Button>
           ) : null}
         </div>
       </form>
       {group.expenses.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No expenses yet.</p>
+        <div className="flex flex-col gap-2">
+          <p className="text-sm text-muted-foreground">No expenses yet.</p>
+          {group.people.length === 0 ? (
+            <Link href={`/groups/${group.id}/people`} className="text-sm text-primary">
+              People
+            </Link>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 w-fit md:h-9"
+              data-testid="empty-add-expense"
+              onClick={() => document.getElementById("expense-amount")?.focus()}
+            >
+              Add the first expense
+            </Button>
+          )}
+        </div>
       ) : (
         <ul className="flex flex-col gap-3">
           {group.expenses.map((expense) => (
@@ -295,6 +394,9 @@ export function ExpensesPanel() {
                       {formatLkr(expense.amountCents)} paid by{" "}
                       {personName(group.people, expense.paidBy)} ({expense.splitType})
                     </p>
+                    {expense.date ? (
+                      <p className="text-muted-foreground">{expense.date}</p>
+                    ) : null}
                     <p className="text-muted-foreground">
                       Participants:{" "}
                       {expense.participantIds
@@ -312,15 +414,34 @@ export function ExpensesPanel() {
                     >
                       Edit
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      type="button"
-                      data-testid={`expense-delete-${expense.id}`}
-                      onClick={() => deleteExpense(expense.id)}
-                    >
-                      Delete
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          type="button"
+                          data-testid={`expense-delete-${expense.id}`}
+                        >
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete this expense?</AlertDialogTitle>
+                          <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            variant="destructive"
+                            data-testid="expense-delete-confirm"
+                            onClick={() => deleteExpense(expense.id)}
+                          >
+                            Delete expense
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardContent>
               </Card>
