@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). On a phone, open that URL in the browser and use Add to Home Screen — SplitWay installs as a standalone app (PWA).
 
 Engine tests, including acceptance scenario AT-01 (Alice, Bob, Carol, Dave):
 
