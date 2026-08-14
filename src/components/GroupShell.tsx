@@ -120,6 +120,7 @@ export function GroupShell({
             </div>
             <Link
               href="/"
+              aria-label="Back to groups"
               className="text-sm font-medium text-muted-foreground hover:text-foreground"
             >
               All groups
