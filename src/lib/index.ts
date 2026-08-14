@@ -11,7 +11,7 @@ export type {
 export { toCents, formatLkr } from "./money"
 export { equalShares, exactShares } from "./splits"
 export { balances } from "./balances"
-export { settle } from "./settle"
+export { settle, transferKey } from "./settle"
 export {
   load,
   save,
@@ -22,4 +22,6 @@ export {
   upsertGroup,
   removeGroup,
   sessionOf,
+  serializeGroups,
+  deserializeGroups,
 } from "./store"
