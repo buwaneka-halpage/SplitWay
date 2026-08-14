@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { ArrowLeftRight, ChevronLeft, Receipt, Scale, Users } from "lucide-react"
 import { loadGroup, upsertGroup, type Group } from "@/lib"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { cn } from "@/lib/utils"
 
 const GroupContext = createContext<{
@@ -107,6 +108,7 @@ export function GroupShell({
             <h1 className="min-w-0 flex-1 truncate text-lg font-semibold tracking-tight">
               {group.name}
             </h1>
+            <ThemeToggle />
           </header>
           <header className="hidden items-center justify-between border-b px-8 py-4 md:flex">
             <div>
@@ -118,13 +120,16 @@ export function GroupShell({
                 {group.expenses.length === 1 ? "expense" : "expenses"}
               </p>
             </div>
-            <Link
-              href="/"
-              aria-label="Back to groups"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground"
-            >
-              All groups
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/"
+                aria-label="Back to groups"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
+              >
+                All groups
+              </Link>
+              <ThemeToggle />
+            </div>
           </header>
           <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
         </div>
