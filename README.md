@@ -27,6 +27,13 @@ Engine tests, including acceptance scenario AT-01 (Alice, Bob, Carol, Dave):
 npm test
 ```
 
+End-to-end tests (Playwright, same proposal scenario through the UI):
+
+```bash
+npx playwright install chromium
+npm run test:e2e
+```
+
 ## Assumptions
 
 **No accounts.** The spec is a single-session tool, not a multi-user service. Anyone with the page open can add people and expenses. Skipping identity kept the work on split and settle math.
