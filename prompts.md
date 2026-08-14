@@ -43,7 +43,7 @@ export type Transfer = { from: PersonId; to: PersonId; amountCents: number }
 
 toCents(input: string | number): number
 formatLkr(cents: number): string
-equalShares(totalCents: number, participantIds: PersonId[]): Record<PersonId, number>
+equalShares(totalCents: number, participantIds: PersonId[], expenseId?: string): Record<PersonId, number>
 exactShares(totalCents: number, exactCents: Record<PersonId, number>): Record<PersonId, number>
 balances(session: Session): Record<PersonId, number>
 settle(nets: Record<PersonId, number>): Transfer[]
@@ -61,31 +61,9 @@ Already on `main`: original Word file at `docs/Project-Expense-Splitter.docx` an
 
 ---
 
-## Prompt R — Agent-Research (internal, no git)
+## Prompt R — Agent-Research (done)
 
-You are a read-only research agent. Do not clone into SplitWay. Do not open a PR. Do not write files into `/Users/berzerk/Projects/SplitWay`.
-
-Inspect https://github.com/spliit-app/spliit and report how it handles leftover currency minor units so balances always reconcile to zero. That is the "You Must Explicitly Handle" rounding requirement from an expense-splitter take-home.
-
-Start with:
-
-- `src/lib/shares.ts` (`apportion`, leftover minor unit, tie-break)
-- `src/lib/totals.ts`
-- `src/lib/balances.ts`
-- `src/lib/schemas.ts` (exact-amount sum validation)
-- tests for remainder distribution
-- PR https://github.com/spliit-app/spliit/pull/462
-- issue https://github.com/spliit-app/spliit/issues/430
-
-Return only a bullet list to the mastermind:
-
-1. How leftover cents are distributed so shares always sum to the expense total
-2. Tie-break when remainders are equal
-3. How exact-amount splits avoid IEEE-754 sum failures
-4. Whether invalid totals are rejected or renormalized
-5. One paragraph: recommended rule for a from-scratch app using integer cents and no extra library
-
-Do not suggest copying code. Describe the algorithm.
+Internal. Findings folded into Prompt 5 rounding rules. No repo writes.
 
 ---
 
@@ -217,7 +195,15 @@ Fixes #11
 - `src/lib/types.ts` — shared types.
 - `src/lib/engine.test.ts` — tests below.
 
-**Rounding (required):** all arithmetic in integer cents. Equal split: each participant gets `floor(total/n)`; leftover cents distributed one-by-one by largest remainder; ties broken by stable sorted participant id. Shares must sum to `totalCents`. Example: 10000 cents / 3 → 3334, 3333, 3333 in some deterministic order (Rs. 100.00). Exact split: `exactCents` values must sum to `totalCents` or throw. Do not use IEEE-754 to compare rupee decimals.
+**Rounding (locked — required):**
+
+- All money is integer cents. Never add or compare display-unit floats (`10.54 + 8.44`).
+- Sort participants by id first so UI order cannot change the result.
+- Equal split weights are all `1`. Each person gets `floor(amount × weight / Σweights)`. Leftover `R = amount − Σfloors` (in `[0, n)`) is given out **one cent at a time by largest remainder** (Hamilton): largest `amount×weight − floor×Σweights` first.
+- Equal remainders (always on an even split): rotate by `offset = FNV-1a-32(expenseId) % n` (offset `0` if no id). Among ties, smaller `(index − offset + n) % n` wins so the extra cent does not always land on the same people. Same id → same split.
+- Shares must sum to `totalCents`. Example: 10000 cents / 3 people → 3334+3333+3333, never 9999 or 10001.
+- Exact split: `ΣexactCents === totalCents` with integer `===` or **throw**. Do not dump a mismatch onto the payer. Do not renormalize bad input.
+- Balances = `paid − Σinteger shares`. After every mutation, `sum(balances) === 0`. No per-person `Math.round` on floats.
 
 **Settle:** copy nets, partition debtors/creditors, repeatedly pay `min(|debt|, credit)` from largest debtor to largest creditor until all zero. Ignore 0-cent balances.
 
