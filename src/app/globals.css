@@ -122,9 +122,17 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-muted text-foreground;
+    @apply bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
   }
   html {
     @apply font-sans;
+  }
+}
+
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  html,
+  body {
+    overscroll-behavior: none;
   }
 }
