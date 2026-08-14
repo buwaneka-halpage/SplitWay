@@ -1,9 +1,22 @@
 import { expect, test, type Page } from "@playwright/test"
 
+async function startGroup(page: Page, name = "Trip") {
+  await page.getByTestId("group-name").fill(name)
+  await page.getByTestId("group-add").click()
+  await page.getByTestId(`group-${name}`).click()
+  await expect(page.getByTestId("tab-people")).toBeVisible()
+}
+
 async function addPerson(page: Page, name: string) {
+  await page.getByTestId("tab-people").click()
   await page.getByTestId("person-name").fill(name)
   await page.getByTestId("person-add").click()
   await expect(page.getByTestId(`person-${name}`)).toBeVisible()
+}
+
+async function openExpenses(page: Page) {
+  await page.getByTestId("tab-expenses").click()
+  await expect(page.getByTestId("expense-amount")).toBeVisible()
 }
 
 async function setParticipants(page: Page, names: string[]) {
@@ -28,9 +41,11 @@ test.beforeEach(async ({ page }) => {
 test("AT-01: Alice Bob Carol Dave balances sum to zero and settle-up is minimized", async ({
   page,
 }) => {
+  await startGroup(page)
   for (const name of ["Alice", "Bob", "Carol", "Dave"]) {
     await addPerson(page, name)
   }
+  await openExpenses(page)
 
   await page.getByTestId("expense-amount").fill("12000")
   await page.getByTestId("expense-payer").selectOption({ label: "Alice" })
@@ -56,29 +71,36 @@ test("AT-01: Alice Bob Carol Dave balances sum to zero and settle-up is minimize
   await page.getByTestId("expense-submit").click()
   await expect(page.getByText("Rs. 6,000.00 paid by Dave")).toBeVisible()
 
+  await page.getByTestId("tab-balances").click()
   await expect(page.getByTestId("balance-sum")).toHaveText("Sum: Rs. 0.00")
   await expect(page.getByTestId("balance-Alice")).toContainText("Rs. 5,666.67")
   await expect(page.getByTestId("balance-Bob")).toContainText("-Rs. 9,333.33")
   await expect(page.getByTestId("balance-Carol")).toContainText("Rs. 7,000.00")
   await expect(page.getByTestId("balance-Dave")).toContainText("-Rs. 3,333.34")
 
+  await page.getByTestId("tab-settle").click()
   const rows = page.getByTestId("settle-row")
   await expect(rows).toHaveCount(3)
   await expect(page.getByTestId("settle-up")).not.toContainText("pairwise")
 })
 
 test("Rs. 100 equal among 3 people shows a zero balance sum", async ({ page }) => {
+  await startGroup(page)
   for (const name of ["Ann", "Bea", "Cam"]) await addPerson(page, name)
+  await openExpenses(page)
   await page.getByTestId("expense-amount").fill("100")
   await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
   await setParticipants(page, ["Ann", "Bea", "Cam"])
   await page.getByTestId("expense-submit").click()
+  await page.getByTestId("tab-balances").click()
   await expect(page.getByTestId("balance-sum")).toHaveText("Sum: Rs. 0.00")
 })
 
 test("exact amounts that do not sum are rejected and not saved", async ({ page }) => {
+  await startGroup(page)
   await addPerson(page, "Ann")
   await addPerson(page, "Bea")
+  await openExpenses(page)
   await page.getByTestId("expense-amount").fill("100")
   await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
   await page.getByTestId("participant-Ann").check()
@@ -94,26 +116,52 @@ test("exact amounts that do not sum are rejected and not saved", async ({ page }
 test("edit and delete recalculate balances; reload restores the session", async ({
   page,
 }) => {
+  await startGroup(page)
   await addPerson(page, "Ann")
   await addPerson(page, "Bea")
+  await openExpenses(page)
   await page.getByTestId("expense-amount").fill("100")
   await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
   await page.getByTestId("participant-Ann").check()
   await page.getByTestId("participant-Bea").check()
   await page.getByTestId("expense-submit").click()
+  await page.getByTestId("tab-balances").click()
   await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 50.00")
 
+  await page.getByTestId("tab-expenses").click()
   await page.getByRole("button", { name: "Edit" }).click()
   await page.getByTestId("expense-amount").fill("200")
   await page.getByTestId("expense-submit").click()
+  await page.getByTestId("tab-balances").click()
   await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 100.00")
   await expect(page.getByTestId("balance-sum")).toHaveText("Sum: Rs. 0.00")
 
   await page.reload()
+  await page.getByTestId("tab-people").click()
   await expect(page.getByTestId("person-Ann")).toBeVisible()
+  await page.getByTestId("tab-balances").click()
   await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 100.00")
 
+  await page.getByTestId("tab-expenses").click()
   await page.getByRole("button", { name: "Delete" }).click()
   await expect(page.getByText("No expenses yet.")).toBeVisible()
+  await page.getByTestId("tab-balances").click()
   await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 0.00")
+})
+
+test("groups keep people and expenses separate", async ({ page }) => {
+  await startGroup(page, "Trip")
+  await addPerson(page, "Ann")
+  await openExpenses(page)
+  await page.getByTestId("expense-amount").fill("100")
+  await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
+  await page.getByTestId("participant-Ann").check()
+  await page.getByTestId("expense-submit").click()
+
+  await page.getByRole("link", { name: "Back to groups" }).click()
+  await startGroup(page, "House")
+  await expect(page.getByTestId("person-Ann")).toHaveCount(0)
+  await addPerson(page, "Bea")
+  await page.getByTestId("tab-expenses").click()
+  await expect(page.getByText("No expenses yet.")).toBeVisible()
 })

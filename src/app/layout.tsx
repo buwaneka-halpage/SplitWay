@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "SplitWay",
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
   },
   icons: {
     apple: "/apple-touch-icon.png",
@@ -31,6 +31,7 @@ export const viewport: Viewport = {
   themeColor: "#0f766e",
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-dvh font-sans">
         <PwaRegister />
         {children}
       </body>

@@ -1,6 +1,6 @@
 # SplitWay
 
-SplitWay is a single-session web app that records shared expenses in Sri Lankan Rupees (LKR) and shows who owes whom. There is no login and no user accounts: one anonymous browser session, add people, log expenses, read running balances, settle up.
+SplitWay is a web app that records shared expenses in Sri Lankan Rupees (LKR) and shows who owes whom. There is no login and no user accounts: add groups, add people, log expenses, read running balances, settle up.
 
 It is a Next.js App Router + TypeScript app. Session data stays in the browser. There is no backend and no secrets, so there is no `.env`.
 
@@ -9,6 +9,7 @@ Design docs:
 - [Product proposal](docs/PROJECT_PROPOSAL.md)
 - [Software requirements specification](docs/SRS.md)
 - [Software architecture document](docs/SAD.md)
+- [Handoff](HANDOFF.md)
 
 ## How to run
 
@@ -36,9 +37,9 @@ npm run test:e2e
 
 ## Assumptions
 
-**No accounts.** The spec is a single-session tool, not a multi-user service. Anyone with the page open can add people and expenses. Skipping identity kept the work on split and settle math.
+**No accounts.** Anyone with the page open can add groups, people, and expenses. Skipping identity kept the work on split and settle math.
 
-**Persistence.** The session (`people` + `expenses`) is saved under the `localStorage` key `splitway:v1`. A refresh restores the same group. Tests use an in-memory fallback when `window` is missing. localStorage was chosen so time went into split/settle logic instead of servers, databases, or sync.
+**Persistence.** Groups (`name` + `people` + `expenses`) are saved under the `localStorage` key `splitway:v2`. A leftover single session at `splitway:v1` is imported once as a group named "My group". A refresh restores the same groups. Tests use an in-memory fallback when `window` is missing. localStorage was chosen so time went into split/settle logic instead of servers, databases, or sync.
 
 **LKR only.** Amounts are typed as rupees and stored as integer cents. There is no currency code per expense and no conversion.
 
@@ -56,7 +57,6 @@ Money is never added or compared as IEEE-754 rupee floats. An equal split floors
 
 Correctness of shares, nets, and settle-up was prioritized over covering every extra feature.
 
-- **UI polish** is out of scope. The page is usable (people → expenses → balances → settle up) on a desktop browser. Mobile layout and visual design were not the goal.
 - **Percentage split** was not built. Exact amount covers the second required split type.
 - **Bonus invalid-total handling** (percentages ≠ 100%, or silently fixing exact amounts that do not sum) was skipped. Exact mismatches fail closed so a bad row cannot quietly unbalance the session.
 
@@ -66,5 +66,4 @@ With more time, in this order:
 
 1. Percentage split, still in integer cents, with a clear reject (or an explicit leftover rule) when weights do not sum to 100%.
 2. A better exact-split error in the UI when cents do not sum to the total, without changing the fail-closed engine.
-3. Mobile layout and small UX cleanup (the flow is already there).
-4. Only after that: optional export/import of the session JSON. Still no accounts.
+3. Optional export/import of group JSON. Still no accounts.

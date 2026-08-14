@@ -15,4 +15,8 @@ export type Expense = {
 
 export type Session = { people: Person[]; expenses: Expense[] }
 
+export type GroupId = string
+
+export type Group = Session & { id: GroupId; name: string }
+
 export type Transfer = { from: PersonId; to: PersonId; amountCents: number }
