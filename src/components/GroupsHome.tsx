@@ -34,25 +34,28 @@ export function GroupsHome() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-5 px-4 pb-8 pt-2">
-      <header className="pt-2">
-        <p className="text-xs font-medium tracking-wide text-primary uppercase">LKR splitter</p>
-        <h1 className="text-2xl font-semibold tracking-tight">SplitWay</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Groups stay on this phone. No login.
-        </p>
+    <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-4 pb-8 pt-2 md:mx-auto md:w-full md:max-w-5xl md:px-8 md:py-10">
+      <header className="flex flex-col gap-1 pt-2 md:flex-row md:items-end md:justify-between md:pt-0">
+        <div>
+          <p className="text-xs font-medium tracking-wide text-primary uppercase">LKR splitter</p>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">SplitWay</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            <span className="md:hidden">Groups stay on this phone. No login.</span>
+            <span className="hidden md:inline">Groups stay in this browser. No login.</span>
+          </p>
+        </div>
       </header>
 
-      <form className="flex gap-2" onSubmit={addGroup}>
+      <form className="flex gap-2 md:max-w-md" onSubmit={addGroup}>
         <Input
-          className="h-11 text-base"
+          className="h-11 text-base md:h-9 md:text-sm"
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Trip, house, dinner…"
           autoComplete="off"
           data-testid="group-name"
         />
-        <Button className="h-11 px-4" type="submit" data-testid="group-add">
+        <Button className="h-11 px-4 md:h-9" type="submit" data-testid="group-add">
           <Plus />
           New
         </Button>
@@ -61,10 +64,10 @@ export function GroupsHome() {
       {groups.length === 0 ? (
         <p className="text-sm text-muted-foreground">No groups yet. Name one to start.</p>
       ) : (
-        <ul className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-3 md:grid md:grid-cols-2 lg:grid-cols-3">
           {groups.map((group) => (
             <li key={group.id}>
-              <Card size="sm">
+              <Card size="sm" className="h-full">
                 <CardHeader className="flex-row items-start justify-between gap-2">
                   <Link
                     href={`/groups/${group.id}`}

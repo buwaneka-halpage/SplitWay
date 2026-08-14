@@ -31,7 +31,7 @@ Folded in from GitHub `d2daf08` (`feat/polished-pwa-ui`): maskable icon, service
 ## App routes
 
 - `/` — groups list
-- `/groups/[groupId]` — expenses (group layout + bottom tabs)
+- `/groups/[groupId]` — expenses (mobile bottom tabs, desktop sidebar)
 - `/groups/[groupId]/people`
 - `/groups/[groupId]/balances`
 - `/groups/[groupId]/settle`

@@ -5,5 +5,9 @@ export default async function GroupLayout({
   params,
 }: LayoutProps<"/groups/[groupId]">) {
   const { groupId } = await params
-  return <GroupShell groupId={groupId}>{children}</GroupShell>
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <GroupShell groupId={groupId}>{children}</GroupShell>
+    </div>
+  )
 }

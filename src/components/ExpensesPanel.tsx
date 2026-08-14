@@ -28,7 +28,7 @@ function emptyForm(): ExpenseFormState {
   }
 }
 
-const fieldClass = "h-11 text-base"
+const fieldClass = "h-11 text-base md:h-9 md:text-sm"
 
 export function ExpensesPanel() {
   const { group, commit } = useGroup()
@@ -123,9 +123,9 @@ export function ExpensesPanel() {
   }
 
   return (
-    <section className="flex flex-col gap-4 px-4 py-4">
-      <h2 className="text-lg font-semibold">Expenses</h2>
-      <form className="flex flex-col gap-3" onSubmit={submitExpense}>
+    <section className="flex flex-col gap-4 px-4 py-4 md:grid md:grid-cols-[minmax(18rem,22rem)_1fr] md:items-start md:gap-8 md:px-8 md:py-6">
+      <h2 className="text-lg font-semibold md:col-span-2">Expenses</h2>
+      <form className="flex flex-col gap-3 md:sticky md:top-4" onSubmit={submitExpense}>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="expense-amount">Amount (LKR)</Label>
           <Input
@@ -249,11 +249,11 @@ export function ExpensesPanel() {
           </p>
         ) : null}
         <div className="flex gap-2">
-          <Button className="h-11" type="submit" data-testid="expense-submit">
+          <Button className="h-11 md:h-9" type="submit" data-testid="expense-submit">
             {editingId ? "Save expense" : "Add expense"}
           </Button>
           {editingId ? (
-            <Button className="h-11" variant="outline" type="button" onClick={resetExpenseForm}>
+            <Button className="h-11 md:h-9" variant="outline" type="button" onClick={resetExpenseForm}>
               Cancel
             </Button>
           ) : null}
