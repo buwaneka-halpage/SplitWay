@@ -32,7 +32,10 @@ async function setParticipants(page: Page, names: string[]) {
     const id = (await box.getAttribute("data-testid")) ?? ""
     const name = id.replace("participant-", "")
     const should = names.includes(name)
-    if (should !== (await box.isChecked())) await box.click()
+    const on =
+      (await box.getAttribute("aria-checked")) === "true" ||
+      (await box.isChecked().catch(() => false))
+    if (should !== on) await box.click()
   }
 }
 

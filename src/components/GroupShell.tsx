@@ -86,7 +86,7 @@ export function GroupShell({
               href={href}
               data-testid={tab.testId}
               className={cn(
-                "flex flex-col items-center gap-0.5 py-2 text-[11px] font-medium",
+                "flex min-h-11 flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium",
                 active ? "text-primary" : "text-muted-foreground",
               )}
             >

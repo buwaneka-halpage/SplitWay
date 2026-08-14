@@ -20,7 +20,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). On a phone, open that URL in the browser and use Add to Home Screen — SplitWay installs as a standalone app (PWA).
+Open [http://localhost:3000](http://localhost:3000). Live: [https://splitway-five.vercel.app](https://splitway-five.vercel.app).
 
 Engine tests, including acceptance scenario AT-01 (Alice, Bob, Carol, Dave):
 
@@ -48,6 +48,14 @@ npm run test:e2e
 **Integer cents.** All stored amounts and all arithmetic use cents. Display uses rupees with two decimal places. Equal splits use the Hamilton (largest remainder) method so leftover cents are distributed and shares always sum to the expense total. Splitting Rs. 100 among 3 people never yields Rs. 99.99 or Rs. 100.01. Exact splits are rejected unless the given cents sum to the total; they are not renormalized.
 
 **Settle-up.** Greedy largest-debtor vs largest-creditor: repeatedly transfer `min(|debt|, credit)` until every net is 0. For `n` people with a non-zero net, the plan has at most `n − 1` payments. It is not a list of pairwise IOUs from each expense.
+
+## Install on a phone
+
+The app is a PWA (`display: standalone`). Session data stays in `localStorage` on that device — installing or opening it on another phone starts a separate session.
+
+1. Open [https://splitway-five.vercel.app](https://splitway-five.vercel.app) in Safari (iOS) or Chrome (Android).
+2. iOS: Share → Add to Home Screen. Android: menu → Install app / Add to Home Screen.
+3. Launch from the home-screen icon. It runs without the browser chrome.
 
 ## How rounding works
 

@@ -25,6 +25,9 @@ Mastermind copy-paste prompts. Each prompt is self-contained. Public GitHub repo
 | Agent-Readme | #12 | `README.md` | 3 |
 | Agent-Test | #20 | `src/lib/*.test.ts`, `e2e/**`, `playwright.config.ts`, `data-testid` on UI | 4 |
 | Agent-PWA | #21 | `src/app/manifest.ts`, icons, layout metadata, optional service worker | 5 |
+| Agent-Polish | #26 | `src/app/**`, `src/components/**`, `components.json`, `src/lib/utils.ts` (cn only), Playwright Pixel 5, README live URL | 6 |
+
+Live production: `https://splitway-five.vercel.app` (Vercel project `splitway`). Session stays in that browser's `localStorage` — phone install ≠ synced with desktop.
 
 Engine public API (lock this; UI imports it):
 
@@ -344,3 +347,53 @@ Optional: a tiny service worker so the shell loads offline. Prefer Next/Serwist 
 Do not add auth. Do not mention other products. Keep the existing one-page UI.
 
 **Done when:** `app/manifest.ts` serves, icons exist, `npm run build` succeeds, PR opened with `Fixes #21`.
+
+---
+
+## Prompt 10 — Agent-Polish (mobile PWA UI)
+
+You are implementing GitHub issue https://github.com/buwaneka-halpage/SplitWay/issues/26 in repo `/Users/berzerk/Projects/SplitWay`.
+
+**Goal:** Restyle the existing flow with shadcn/ui, keep it a usable iOS/Android PWA, keep e2e green (including Pixel 5), put the live URL in the README. Engine math and `data-testid`s stay.
+
+**Branch:** `feat/polished-pwa-ui`  
+**PR title:** `feat: polished mobile PWA UI`  
+**PR body:** `Fixes #26`
+
+**Owns:** `src/app/**`, `src/components/**`, `components.json`, `src/lib/utils.ts` (`cn` only — do not rewrite engine files), `playwright.config.ts`, `e2e/**`, `README.md`, `package.json` / lockfile for UI deps, PWA assets under `public/` if needed.
+
+**Do:**
+
+- Init shadcn/ui (Radix + Tailwind v4). If `next build` cannot resolve `@import "shadcn/tailwind.css"`, `npx shadcn@latest eject -y` inlines it and drops the `shadcn` package.
+- Restyle People → Expenses → Balances → Settle. Mobile: ~44px tap targets, safe-area padding, bottom nav.
+- Preserve existing `data-testid` hooks. Radix checkboxes use `aria-checked` — e2e must handle that.
+- Playwright: Desktop Chrome **and** Pixel 5 projects.
+- Manifest: `display: "standalone"`, any + maskable icons, Apple touch icon metadata already on main — do not regress.
+- README: live URL `https://splitway-five.vercel.app`. Session is per-browser `localStorage`.
+- `npm test`, `npm run test:e2e`, `npm run build` must pass.
+
+**Do not:** change `src/lib/money|splits|balances|settle|store|types.ts` public API; add auth or percentage split; commit `.env` / `.vercel`; merge the PR (mastermind merges).
+
+**Done when:** PR opened with `Fixes #26`.
+
+---
+
+## Prompt M — Mastermind (operating loop)
+
+You are the mastermind for SplitWay. You do not implement feature code unless the human asks you to finish open work yourself.
+
+**Sources of truth:** this file, `docs/PROJECT_PROPOSAL.md`, `docs/SRS.md`, `HANDOFF.md` (if present), GitHub issues/PRs.
+
+**Loop:**
+
+1. Sync with `main`. Read open issues. Prefer finishing open PRs/issues over inventing work.
+2. Spawn one agent per assignment row / open issue. Give them their Prompt N verbatim. They branch, commit, push, open PR with `Fixes #<n>`. **You merge.**
+3. After merge: confirm CI/build if present; for deploys prefer git-backed Vercel from `main` over dirty CLI deploys.
+4. Update the assignment table or mark prompts done. Ask before opening optional follow-ups (percentage split, export/import).
+
+**Hard product locks:** no auth; LKR cents; equal + exact only; never name other expense-splitter products; never commit secrets.
+
+**PWA check (manual):** open `https://splitway-five.vercel.app` on a phone → Add to Home Screen → launch icon → confirm no browser chrome and session persists on that device only.
+
+**When handing off:** write/update `HANDOFF.md` with branch tip, open issues, uncommitted work, live URL, and the next concrete command.
+
