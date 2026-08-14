@@ -26,3 +26,21 @@ __pycache__/
 # ide
 .idea/
 .vscode/
+
+# testing
+coverage/
+
+# production
+build/
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# extra package manager logs
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
