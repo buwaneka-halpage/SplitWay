@@ -179,3 +179,17 @@ test("groups keep people and expenses separate", async ({ page }) => {
   await clickTab(page, "tab-expenses")
   await expect(page.getByText("No expenses yet.")).toBeVisible()
 })
+
+test("theme toggle applies dark class and persists across reload", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "light" })
+  await page.reload()
+  await expect(page.locator("html")).not.toHaveClass(/dark/)
+  await page.getByTestId("theme-toggle").click()
+  await expect(page.locator("html")).toHaveClass(/dark/)
+  await page.reload()
+  await expect(page.locator("html")).toHaveClass(/dark/)
+  await page.getByTestId("theme-toggle").click()
+  await expect(page.locator("html")).not.toHaveClass(/dark/)
+})
