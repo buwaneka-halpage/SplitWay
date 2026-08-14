@@ -1,0 +1,28 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next
+.next/
+out/
+.turbo
+
+# env
+.env
+.env*.local
+!.env.example
+
+# debug / os
+npm-debug.log*
+.DS_Store
+*.pem
+
+# python / diagrams
+__pycache__/
+*.pyc
+.venv/
+
+# ide
+.idea/
+.vscode/
