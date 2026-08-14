@@ -37,7 +37,7 @@ Persistence: `localStorage` key **`splitway:v2`** `{ groups }`. A leftover `spli
 
 ### Engine API (lock the math; extras are persistence/UI)
 
-UI imports from `@/lib`. Math signatures stay. Group extras are stored and cloned; they do not feed `balances()` / `settle()`.
+UI imports from `@/lib`. Math signatures stay. Group extras are stored and cloned; they do not feed `balances()` / `settle()`. Form helpers live in `@/lib/form` (not re-exported from `@/lib`).
 
 ```ts
 export type PersonId = string
@@ -84,7 +84,7 @@ sessionOf(group: Group): Session
 serializeGroups(groups: Group[]): string
 deserializeGroups(json: string): Group[] | null
 
-// form helpers (not math)
+// form helpers — import from `@/lib/form`, not `@/lib`
 newId(): string
 todayDate(): string // local YYYY-MM-DD
 parseCents(raw, allowZero): number | null
@@ -116,7 +116,7 @@ Percentage split, auth, cloud sync, receipts, multi-currency, silently “fixing
 | Agent-Readme | #12 | `README.md` | 3 | Done — PR #19 |
 | Agent-Test | #20 | tests + `data-testid` | 4 | Done — PR #22 |
 | Agent-PWA | #21 | manifest, icons, SW | 5 | Done — PRs #23–#25 |
-| Agent-Polish | #26 | shadcn, shells, Pixel 5 | 6 | Done — PRs #26-issue via #27, #28 |
+| Agent-Polish | #26 | shadcn, shells, Pixel 5 | 6 | Done — issue #26; PRs #27, #28 |
 | Groups / workflow | — | groups v2, dates, export, rename, ticks | 7 | Open — [PR #29](https://github.com/buwaneka-halpage/SplitWay/pull/29) |
 | Dark mode | — | `ThemeToggle`, `html.dark` | 7 | Done — PR #30 |
 
