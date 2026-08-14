@@ -1,0 +1,208 @@
+digraph "SD-04 Edit / delete expense" {
+  graph [label="SD-04 Edit / delete expense", labelloc=t, fontname="Helvetica", fontsize=16, rankdir=TB, splines=line, newrank=true, compound=true, pad=0.6, bgcolor=white, nodesep=2.1, ranksep=0.42, ordering=out];
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica", fontsize=9];
+
+  // participants
+  H_User [label="User", shape=box, style="rounded,filled", fillcolor="#ECEFF1", color="#37474F", fontsize=12, width=1.7, height=0.5, group=User];
+  H_UI [label="UI", shape=box, style="rounded,filled", fillcolor="#E3F2FD", color="#37474F", fontsize=12, width=1.7, height=0.5, group=UI];
+  H_SessionStore [label="SessionStore", shape=box, style="rounded,filled", fillcolor="#FFF3E0", color="#37474F", fontsize=12, width=1.7, height=0.5, group=SessionStore];
+  H_SplitEngine [label="SplitEngine", shape=box, style="rounded,filled", fillcolor="#F3E5F5", color="#37474F", fontsize=12, width=1.7, height=0.5, group=SplitEngine];
+  { rank=same; H_User H_UI H_SessionStore H_SplitEngine; }
+  edge [style=invis, weight=20];
+  H_User -> H_UI -> H_SessionStore -> H_SplitEngine;
+
+  // lifeline points / self actions
+  n_User_0 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_0 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_0 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_0 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_0 n_UI_0 n_SessionStore_0 n_SplitEngine_0; }
+  n_User_1 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_1 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_1 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_1 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_1 n_UI_1 n_SessionStore_1 n_SplitEngine_1; }
+  n_User_2 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_2 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_2 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_2 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_2 n_UI_2 n_SessionStore_2 n_SplitEngine_2; }
+  n_User_3 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_3 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_3 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_3 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_3 n_UI_3 n_SessionStore_3 n_SplitEngine_3; }
+  n_User_4 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_4 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_4 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_4 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_4 n_UI_4 n_SessionStore_4 n_SplitEngine_4; }
+  n_User_5 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_5 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_5 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_5 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_5 n_UI_5 n_SessionStore_5 n_SplitEngine_5; }
+  n_User_6 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_6 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_6 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_6 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_6 n_UI_6 n_SessionStore_6 n_SplitEngine_6; }
+  n_User_7 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_7 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_7 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_7 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_7 n_UI_7 n_SessionStore_7 n_SplitEngine_7; }
+  n_User_8 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_8 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_8 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_8 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_8 n_UI_8 n_SessionStore_8 n_SplitEngine_8; }
+  n_User_9 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_9 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_9 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_9 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_9 n_UI_9 n_SessionStore_9 n_SplitEngine_9; }
+  n_User_10 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_10 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_10 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_10 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_10 n_UI_10 n_SessionStore_10 n_SplitEngine_10; }
+  n_User_11 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_11 [label="remove expense by id", shape=box, style="rounded,filled", fillcolor="#FFF8E1", color="#F9A825", fontsize=8, width=1.5, height=0.32, group=UI];
+  n_SessionStore_11 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_11 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_11 n_UI_11 n_SessionStore_11 n_SplitEngine_11; }
+  n_User_12 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_12 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_12 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_12 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_12 n_UI_12 n_SessionStore_12 n_SplitEngine_12; }
+  n_User_13 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_13 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_13 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_13 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_13 n_UI_13 n_SessionStore_13 n_SplitEngine_13; }
+  n_User_14 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_14 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_14 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  n_SplitEngine_14 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SplitEngine];
+  { rank=same; n_User_14 n_UI_14 n_SessionStore_14 n_SplitEngine_14; }
+
+  F_User [label="User", shape=box, style="rounded,filled", fillcolor="#ECEFF1", color="#37474F", fontsize=11, width=1.7, height=0.4, group=User];
+  F_UI [label="UI", shape=box, style="rounded,filled", fillcolor="#E3F2FD", color="#37474F", fontsize=11, width=1.7, height=0.4, group=UI];
+  F_SessionStore [label="SessionStore", shape=box, style="rounded,filled", fillcolor="#FFF3E0", color="#37474F", fontsize=11, width=1.7, height=0.4, group=SessionStore];
+  F_SplitEngine [label="SplitEngine", shape=box, style="rounded,filled", fillcolor="#F3E5F5", color="#37474F", fontsize=11, width=1.7, height=0.4, group=SplitEngine];
+  { rank=same; F_User F_UI F_SessionStore F_SplitEngine; }
+
+  // lifelines
+  edge [style=dashed, color="#90A4AE", dir=none, weight=100, penwidth=1.6, constraint=true];
+  H_User -> n_User_0 -> n_User_1 -> n_User_2 -> n_User_3 -> n_User_4 -> n_User_5 -> n_User_6 -> n_User_7 -> n_User_8 -> n_User_9 -> n_User_10 -> n_User_11 -> n_User_12 -> n_User_13 -> n_User_14 -> F_User;
+  H_UI -> n_UI_0 -> n_UI_1 -> n_UI_2 -> n_UI_3 -> n_UI_4 -> n_UI_5 -> n_UI_6 -> n_UI_7 -> n_UI_8 -> n_UI_9 -> n_UI_10 -> n_UI_11 -> n_UI_12 -> n_UI_13 -> n_UI_14 -> F_UI;
+  H_SessionStore -> n_SessionStore_0 -> n_SessionStore_1 -> n_SessionStore_2 -> n_SessionStore_3 -> n_SessionStore_4 -> n_SessionStore_5 -> n_SessionStore_6 -> n_SessionStore_7 -> n_SessionStore_8 -> n_SessionStore_9 -> n_SessionStore_10 -> n_SessionStore_11 -> n_SessionStore_12 -> n_SessionStore_13 -> n_SessionStore_14 -> F_SessionStore;
+  H_SplitEngine -> n_SplitEngine_0 -> n_SplitEngine_1 -> n_SplitEngine_2 -> n_SplitEngine_3 -> n_SplitEngine_4 -> n_SplitEngine_5 -> n_SplitEngine_6 -> n_SplitEngine_7 -> n_SplitEngine_8 -> n_SplitEngine_9 -> n_SplitEngine_10 -> n_SplitEngine_11 -> n_SplitEngine_12 -> n_SplitEngine_13 -> n_SplitEngine_14 -> F_SplitEngine;
+
+  // messages
+  n_User_0 -> n_UI_0 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="select expense", fontcolor="#212121"];
+  n_User_1 -> n_UI_1 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="submit edited fields", fontcolor="#212121"];
+  n_UI_2 -> n_SplitEngine_2 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="equalShares(...)", fontcolor="#212121"];
+  n_UI_3 -> n_SplitEngine_3 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="exactShares(...)", fontcolor="#212121"];
+  n_SplitEngine_4 -> n_UI_4 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="shares or throw", fontcolor="#37474F"];
+  n_UI_5 -> n_SessionStore_5 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="load(); replace; save()", fontcolor="#212121"];
+  n_SessionStore_6 -> n_UI_6 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="ok", fontcolor="#37474F"];
+  n_UI_7 -> n_User_7 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="expense updated", fontcolor="#37474F"];
+  n_User_8 -> n_UI_8 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="delete", fontcolor="#212121"];
+  n_UI_9 -> n_SessionStore_9 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="load()", fontcolor="#212121"];
+  n_SessionStore_10 -> n_UI_10 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="Session", fontcolor="#37474F"];
+  n_UI_12 -> n_SessionStore_12 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="save(session)", fontcolor="#212121"];
+  n_SessionStore_13 -> n_UI_13 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="ok", fontcolor="#37474F"];
+  n_UI_14 -> n_User_14 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="expense removed", fontcolor="#37474F"];
+
+  // combined fragments (UML alt / opt / loop)
+  n_User_0;
+  n_UI_0;
+  n_SessionStore_0;
+  n_SplitEngine_0;
+  subgraph cluster_0 {
+    label="alt [edit]";
+    fontsize=10; fontname="Helvetica"; fontcolor="#C62828";
+    style="rounded,dashed"; color="#C62828"; bgcolor="#FFEBEE"; margin=12;
+    subgraph cluster_0_then {
+      label="[edit]"; fontsize=9; style="rounded,dashed";
+      color="#C62828"; bgcolor="#FFEBEE";
+      n_User_1;
+      n_UI_1;
+      n_SessionStore_1;
+      n_SplitEngine_1;
+      subgraph cluster_1 {
+        label="alt [splitType = equal]";
+        fontsize=10; fontname="Helvetica"; fontcolor="#C62828";
+        style="rounded,dashed"; color="#C62828"; bgcolor="#FFEBEE"; margin=12;
+        subgraph cluster_1_then {
+          label="[splitType = equal]"; fontsize=9; style="rounded,dashed";
+          color="#C62828"; bgcolor="#FFEBEE";
+          n_User_2;
+          n_UI_2;
+          n_SessionStore_2;
+          n_SplitEngine_2;
+        }
+        subgraph cluster_1_else {
+          label="[else]"; fontsize=9; style="rounded,dashed";
+          color="#C62828"; bgcolor="#FFF3E0";
+          n_User_3;
+          n_UI_3;
+          n_SessionStore_3;
+          n_SplitEngine_3;
+        }
+      }
+      n_User_4;
+      n_UI_4;
+      n_SessionStore_4;
+      n_SplitEngine_4;
+      n_User_5;
+      n_UI_5;
+      n_SessionStore_5;
+      n_SplitEngine_5;
+      n_User_6;
+      n_UI_6;
+      n_SessionStore_6;
+      n_SplitEngine_6;
+      n_User_7;
+      n_UI_7;
+      n_SessionStore_7;
+      n_SplitEngine_7;
+    }
+    subgraph cluster_0_else {
+      label="[else]"; fontsize=9; style="rounded,dashed";
+      color="#C62828"; bgcolor="#FFF3E0";
+      n_User_8;
+      n_UI_8;
+      n_SessionStore_8;
+      n_SplitEngine_8;
+      n_User_9;
+      n_UI_9;
+      n_SessionStore_9;
+      n_SplitEngine_9;
+      n_User_10;
+      n_UI_10;
+      n_SessionStore_10;
+      n_SplitEngine_10;
+      n_User_11;
+      n_UI_11;
+      n_SessionStore_11;
+      n_SplitEngine_11;
+      n_User_12;
+      n_UI_12;
+      n_SessionStore_12;
+      n_SplitEngine_12;
+      n_User_13;
+      n_UI_13;
+      n_SessionStore_13;
+      n_SplitEngine_13;
+      n_User_14;
+      n_UI_14;
+      n_SessionStore_14;
+      n_SplitEngine_14;
+    }
+  }
+}
