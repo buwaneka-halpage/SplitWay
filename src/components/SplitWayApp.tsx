@@ -232,9 +232,10 @@ export function SplitWayApp() {
               value={name}
               onChange={(event) => setName(event.target.value)}
               autoComplete="off"
+              data-testid="person-name"
             />
           </label>
-          <button className={btnClass} type="submit">
+          <button className={btnClass} type="submit" data-testid="person-add">
             Add
           </button>
         </form>
@@ -248,12 +249,14 @@ export function SplitWayApp() {
                 <li
                   key={person.id}
                   className="flex items-center justify-between gap-3 border-b border-zinc-200 py-1 dark:border-zinc-800"
+                  data-testid={`person-${person.name}`}
                 >
                   <span>{person.name}</span>
                   <button
                     className={btnClass}
                     type="button"
                     disabled={referenced}
+                    data-testid={`person-remove-${person.name}`}
                     title={
                       referenced
                         ? "Remove is disabled while this person is on an expense"
@@ -279,6 +282,7 @@ export function SplitWayApp() {
               className={fieldClass}
               inputMode="decimal"
               value={form.amount}
+              data-testid="expense-amount"
               onChange={(event) =>
                 setForm((current) => ({ ...current, amount: event.target.value }))
               }
@@ -289,6 +293,7 @@ export function SplitWayApp() {
             <select
               className={fieldClass}
               value={form.paidBy}
+              data-testid="expense-payer"
               onChange={(event) =>
                 setForm((current) => ({ ...current, paidBy: event.target.value }))
               }
@@ -313,6 +318,7 @@ export function SplitWayApp() {
                   <input
                     type="checkbox"
                     checked={form.participantIds.includes(person.id)}
+                    data-testid={`participant-${person.name}`}
                     onChange={() => toggleParticipant(person.id)}
                   />
                   {person.name}
@@ -326,6 +332,7 @@ export function SplitWayApp() {
               <input
                 type="radio"
                 name="splitType"
+                data-testid="split-equal"
                 checked={form.splitType === "equal"}
                 onChange={() =>
                   setForm((current) => ({ ...current, splitType: "equal" }))
@@ -337,6 +344,7 @@ export function SplitWayApp() {
               <input
                 type="radio"
                 name="splitType"
+                data-testid="split-exact"
                 checked={form.splitType === "exact"}
                 onChange={() =>
                   setForm((current) => ({ ...current, splitType: "exact" }))
@@ -359,6 +367,7 @@ export function SplitWayApp() {
                     <input
                       className={fieldClass}
                       inputMode="decimal"
+                      data-testid={`exact-${personName(session.people, id)}`}
                       value={form.exactAmounts[id] ?? ""}
                       onChange={(event) =>
                         setForm((current) => ({
@@ -375,9 +384,13 @@ export function SplitWayApp() {
               )}
             </fieldset>
           )}
-          {error ? <p className="text-sm text-red-700 dark:text-red-400">{error}</p> : null}
+          {error ? (
+            <p className="text-sm text-red-700 dark:text-red-400" data-testid="form-error">
+              {error}
+            </p>
+          ) : null}
           <div className="flex gap-2">
-            <button className={btnClass} type="submit">
+            <button className={btnClass} type="submit" data-testid="expense-submit">
               {editingId ? "Save expense" : "Add expense"}
             </button>
             {editingId ? (
@@ -395,6 +408,7 @@ export function SplitWayApp() {
               <li
                 key={expense.id}
                 className="flex flex-wrap items-start justify-between gap-3 border border-zinc-200 p-3 dark:border-zinc-800"
+                data-testid={`expense-${expense.id}`}
               >
                 <div className="text-sm">
                   <p>
@@ -413,6 +427,7 @@ export function SplitWayApp() {
                   <button
                     className={btnClass}
                     type="button"
+                    data-testid={`expense-edit-${expense.id}`}
                     onClick={() => startEdit(expense)}
                   >
                     Edit
@@ -420,6 +435,7 @@ export function SplitWayApp() {
                   <button
                     className={btnClass}
                     type="button"
+                    data-testid={`expense-delete-${expense.id}`}
                     onClick={() => deleteExpense(expense.id)}
                   >
                     Delete
@@ -431,7 +447,7 @@ export function SplitWayApp() {
         )}
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3" data-testid="balances">
         <h2 className="text-xl font-semibold">Balances</h2>
         {session.people.length === 0 ? (
           <p className="text-sm text-zinc-600 dark:text-zinc-400">No balances yet.</p>
@@ -442,17 +458,19 @@ export function SplitWayApp() {
               const meaning =
                 net > 0 ? "owed (group owes them)" : net < 0 ? "owes" : "settled";
               return (
-                <li key={person.id}>
+                <li key={person.id} data-testid={`balance-${person.name}`}>
                   {person.name}: {formatLkr(net)} — {meaning}
                 </li>
               );
             })}
           </ul>
         )}
-        <p className="text-sm">Sum: {formatLkr(netSum)}</p>
+        <p className="text-sm" data-testid="balance-sum">
+          Sum: {formatLkr(netSum)}
+        </p>
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-3" data-testid="settle-up">
         <h2 className="text-xl font-semibold">Settle Up</h2>
         {transfers.length === 0 ? (
           <p className="text-sm text-zinc-600 dark:text-zinc-400">
@@ -461,7 +479,10 @@ export function SplitWayApp() {
         ) : (
           <ul className="flex flex-col gap-1 text-sm">
             {transfers.map((transfer) => (
-              <li key={`${transfer.from}-${transfer.to}-${transfer.amountCents}`}>
+              <li
+                key={`${transfer.from}-${transfer.to}-${transfer.amountCents}`}
+                data-testid="settle-row"
+              >
                 {personName(session.people, transfer.from)} pays{" "}
                 {personName(session.people, transfer.to)} {formatLkr(transfer.amountCents)}
               </li>

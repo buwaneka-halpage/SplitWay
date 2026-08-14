@@ -23,6 +23,8 @@ Mastermind copy-paste prompts. Each prompt is self-contained. Public GitHub repo
 | Agent-Engine | #5 #6 #7 #8 #9 #10 #11 | `src/lib/**` only | 2 |
 | Agent-UI | #13 | `src/app/**`, `src/components/**` | 2 |
 | Agent-Readme | #12 | `README.md` | 3 |
+| Agent-Test | #20 | `src/lib/*.test.ts`, `e2e/**`, `playwright.config.ts`, `data-testid` on UI | 4 |
+| Agent-PWA | #21 | `src/app/manifest.ts`, icons, layout metadata, optional service worker | 5 |
 
 Engine public API (lock this; UI imports it):
 
@@ -271,3 +273,74 @@ Write `README.md`:
 Do not mention other products. Do not invent a `.env`.
 
 **Done when:** PR opened with `Fixes #12`.
+
+---
+
+## Prompt 8 — Agent-Test (unit + e2e)
+
+You are implementing GitHub issue https://github.com/buwaneka-halpage/SplitWay/issues/20.
+
+**Branch:** `test/unit-e2e`  
+**PR title:** `test: comprehensive unit and e2e coverage`  
+**PR body:** `Fixes #20`
+
+Source of truth for cases: `docs/Project-Expense-Splitter.docx` and `docs/PROJECT_PROPOSAL.md`. Do not name other products.
+
+**Unit tests** (`node:test` + `tsx`, files under `src/lib/*.test.ts`). Cover:
+
+From Core Requirements:
+
+- Add/remove people: 2-person group and 10-person group both compute
+- Equal split among selected people
+- Exact-amount split that sums to the total
+- Exact-amount split that does **not** sum → throw (fail closed; bonus "fix it" is out of scope)
+- Edit expense then balances recompute from the full session
+- Delete expense then balances recompute
+- Running nets: `paid − share`; sum of nets is always `0`
+- Settle-up is minimized (at most `n−1` transfers), not every pairwise IOU
+
+From "You Must Explicitly Handle":
+
+- Rs. 100.00 / 3 people → shares sum to 10000 cents, never 9999 or 10001
+- AT-01 from the proposal (Alice, Bob, Carol, Dave):
+  1. Alice paid Rs. 12,000 equal among 4
+  2. Carol paid Rs. 10,000 exact Alice 3333.33, Bob 3333.33, Dave 3333.34 (Carol not in the split)
+  3. Dave paid Rs. 6,000 equal between Dave and Bob only
+  - nets sum to 0
+  - expected cents: Alice +566667, Bob -933333, Carol +700000, Dave -333334
+  - Bob's share of expense 3 is 300000 (no double-count)
+  - settle length ≤ 3 and zeros all nets
+
+Also: `toCents("3333.33") === 333333` (no IEEE-754); invalid amounts throw; empty participant list throws; payer-not-in-split is valid.
+
+**E2E** with Playwright (`@playwright/test`):
+
+- Drive the real UI: add people → log expenses → view balances → settle up
+- AT-01 through the UI (same numbers)
+- Rounding visible: Rs. 100 equal among 3, balance sum is Rs. 0.00
+- Exact mismatch shows an error and does not save
+- Edit and delete an expense; nets change
+- Reload: localStorage `splitway:v1` restores people/expenses
+- Add `data-testid` hooks on the UI as needed; do not restyle
+
+Scripts: keep `npm test` for unit; add `npm run test:e2e` for Playwright. Playwright `webServer` starts Next on a free port. Gitignore `test-results/` and `playwright-report/`.
+
+**Done when:** `npm test` and `npm run test:e2e` pass, PR opened with `Fixes #20`.
+
+---
+
+## Prompt 9 — Agent-PWA
+
+You are implementing GitHub issue https://github.com/buwaneka-halpage/SplitWay/issues/21.
+
+**Branch:** `feat/pwa`  
+**PR title:** `feat: installable PWA for mobile`  
+**PR body:** `Fixes #21`
+
+Make SplitWay installable on a phone (Add to Home Screen / standalone). Follow the Next.js App Router PWA guide: `src/app/manifest.ts` (`MetadataRoute.Manifest`), `display: "standalone"`, 192 and 512 PNG icons, `appleWebApp` + viewport `themeColor` in `src/app/layout.tsx`.
+
+Optional: a tiny service worker so the shell loads offline. Prefer Next/Serwist or a small `public/sw.js` — do not add a heavy PWA framework if a manifest + icons already make it installable.
+
+Do not add auth. Do not mention other products. Keep the existing one-page UI.
+
+**Done when:** `app/manifest.ts` serves, icons exist, `npm run build` succeeds, PR opened with `Fixes #21`.
