@@ -22,7 +22,16 @@ function cloneSession(session: Session): Session {
 }
 
 function cloneGroup(group: Group): Group {
-  return { id: group.id, name: group.name, ...cloneSession(group) }
+  return {
+    id: group.id,
+    name: group.name,
+    ...cloneSession(group),
+    ...(group.settledKeys ? { settledKeys: [...group.settledKeys] } : {}),
+    ...(group.lastPaidBy ? { lastPaidBy: group.lastPaidBy } : {}),
+    ...(group.lastParticipantIds
+      ? { lastParticipantIds: [...group.lastParticipantIds] }
+      : {}),
+  }
 }
 
 function canUseStorage(): boolean {
@@ -130,4 +139,20 @@ export function removeGroup(id: string): void {
 
 export function sessionOf(group: Group): Session {
   return { people: group.people, expenses: group.expenses }
+}
+
+/** Same `{ groups }` envelope `saveGroups` writes. */
+export function serializeGroups(groups: Group[]): string {
+  return JSON.stringify({ groups: groups.map(cloneGroup) })
+}
+
+/** Returns null if the JSON is not a v2 groups envelope. */
+export function deserializeGroups(json: string): Group[] | null {
+  try {
+    const parsed = JSON.parse(json) as { groups?: unknown }
+    if (!parsed || !Array.isArray(parsed.groups)) return null
+    return parsed.groups.filter(isGroup).map(cloneGroup)
+  } catch {
+    return null
+  }
 }

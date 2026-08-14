@@ -35,9 +35,19 @@ export function parseCents(raw: string, allowZero: boolean): number | null {
   }
 }
 
+/** Local calendar day, not UTC — avoids an off-by-one near midnight. */
+export function todayDate(): string {
+  const d = new Date()
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${y}-${m}-${day}`
+}
+
 export function formFromExpense(expense: Expense): {
   amount: string
   description: string
+  date: string
   paidBy: string
   participantIds: string[]
   splitType: Expense["splitType"]
@@ -52,6 +62,7 @@ export function formFromExpense(expense: Expense): {
   return {
     amount: centsToInput(expense.amountCents),
     description: expense.description ?? "",
+    date: expense.date ?? "",
     paidBy: expense.paidBy,
     participantIds: [...expense.participantIds],
     splitType: expense.splitType,
