@@ -157,10 +157,134 @@ test("edit and delete recalculate balances; reload restores the session", async 
   await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 100.00")
 
   await clickTab(page, "tab-expenses")
-  await page.getByRole("button", { name: "Delete" }).click()
+  await page.getByRole("button", { name: "Delete", exact: true }).click()
+  await expect(page.getByText("Lunch")).toBeVisible()
+  await page.getByTestId("expense-delete-confirm").click()
   await expect(page.getByText("No expenses yet.")).toBeVisible()
   await clickTab(page, "tab-balances")
   await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 0.00")
+})
+
+test("date, split-all, last payer/participants, and exact remainder", async ({
+  page,
+}) => {
+  await startGroup(page)
+  await addPerson(page, "Ann")
+  await addPerson(page, "Bea")
+  await openExpenses(page)
+
+  await expect(page.getByTestId("expense-date")).toHaveValue(/^\d{4}-\d{2}-\d{2}$/)
+  await page.getByTestId("expense-date").fill("2026-01-15")
+  await page.getByTestId("expense-amount").fill("100")
+  await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
+  await page.getByTestId("split-all").click()
+  await expect(page.getByTestId("participant-Ann")).toBeChecked()
+  await expect(page.getByTestId("participant-Bea")).toBeChecked()
+  await page.getByTestId("expense-submit").click()
+  await expect(page.getByText("2026-01-15")).toBeVisible()
+
+  await expect(page.getByTestId("expense-payer").locator("option:checked")).toHaveText(
+    "Ann",
+  )
+  await expect(page.getByTestId("participant-Ann")).toBeChecked()
+  await expect(page.getByTestId("participant-Bea")).toBeChecked()
+
+  await page.getByTestId("expense-amount").fill("100")
+  await page.getByTestId("split-exact").check()
+  await page.getByTestId("exact-Ann").fill("40")
+  await page.getByTestId("exact-Bea").fill("40")
+  await expect(page.getByTestId("exact-remainder")).toContainText("left to assign")
+  await page.getByTestId("expense-submit").click()
+  await expect(page.getByTestId("form-error")).toContainText("sum")
+})
+
+test("rename group and person; group card shows who is owed most", async ({
+  page,
+}) => {
+  await startGroup(page, "Trip")
+  await addPerson(page, "Ann")
+  await addPerson(page, "Bea")
+  await openExpenses(page)
+  await page.getByTestId("expense-amount").fill("100")
+  await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
+  await page.getByTestId("split-all").click()
+  await page.getByTestId("expense-submit").click()
+
+  await clickTab(page, "tab-people")
+  await page.getByTestId("person-rename-Ann").click()
+  await page.getByTestId("person-rename-input").fill("Anna")
+  await page.getByTestId("person-rename-save").click()
+  await expect(page.getByTestId("person-Anna")).toBeVisible()
+
+  await page.getByRole("link", { name: "Back to groups" }).click()
+  await expect(page.getByTestId("group-owed-Trip")).toContainText("Anna is owed")
+  await page.getByTestId("group-rename-Trip").click()
+  await page.getByTestId("group-rename-input").fill("Weekend")
+  await page.getByTestId("group-rename-save").click()
+  await expect(page.getByTestId("group-Weekend")).toBeVisible()
+  await expect(page.getByTestId("group-owed-Weekend")).toContainText("Anna is owed")
+})
+
+test("tick a settle transfer done; reload keeps the tick; balances stay put", async ({
+  page,
+}) => {
+  await startGroup(page)
+  await addPerson(page, "Ann")
+  await addPerson(page, "Bea")
+  await openExpenses(page)
+  await page.getByTestId("expense-amount").fill("100")
+  await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
+  await page.getByTestId("split-all").click()
+  await page.getByTestId("expense-submit").click()
+
+  await clickTab(page, "tab-settle")
+  const row = page.getByTestId("settle-row")
+  await expect(row).toHaveCount(1)
+  await row.getByTestId("settle-done").check()
+  await expect(row.getByTestId("settle-done")).toBeChecked()
+
+  await page.reload()
+  await clickTab(page, "tab-settle")
+  await expect(page.getByTestId("settle-row").getByTestId("settle-done")).toBeChecked()
+  await clickTab(page, "tab-balances")
+  await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 50.00")
+})
+
+test("export and import restore groups; delete group asks first", async ({
+  page,
+}) => {
+  await startGroup(page, "Trip")
+  await addPerson(page, "Ann")
+  await page.getByRole("link", { name: "Back to groups" }).click()
+
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByTestId("groups-export").click(),
+  ])
+  expect(download.suggestedFilename()).toBe("splitway-groups.json")
+
+  await page.getByTestId("group-delete-Trip").click()
+  await expect(page.getByTestId("group-Trip")).toBeVisible()
+  await page.getByTestId("group-delete-confirm").click()
+  await expect(page.getByText("No groups yet.")).toBeVisible()
+
+  await page.getByTestId("groups-import").setInputFiles({
+    name: "splitway-groups.json",
+    mimeType: "application/json",
+    buffer: Buffer.from(
+      JSON.stringify({
+        groups: [
+          {
+            id: "imported",
+            name: "Imported",
+            people: [{ id: "a", name: "Ann" }],
+            expenses: [],
+          },
+        ],
+      }),
+    ),
+  })
+  await expect(page.getByTestId("group-Imported")).toBeVisible()
 })
 
 test("groups keep people and expenses separate", async ({ page }) => {
