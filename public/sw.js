@@ -1,6 +1,6 @@
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open("splitway-v1").then((cache) => cache.addAll(["/", "/manifest.webmanifest"])),
+    caches.open("splitway-v2").then((cache) => cache.addAll(["/", "/manifest.webmanifest"])),
   )
   self.skipWaiting()
 })
@@ -15,7 +15,7 @@ self.addEventListener("fetch", (event) => {
     fetch(event.request)
       .then((response) => {
         const copy = response.clone()
-        caches.open("splitway-v1").then((cache) => cache.put(event.request, copy))
+        caches.open("splitway-v2").then((cache) => cache.put(event.request, copy))
         return response
       })
       .catch(() => caches.match(event.request).then((cached) => cached || caches.match("/"))),

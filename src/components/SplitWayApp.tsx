@@ -1,6 +1,6 @@
-"use client";
+"use client"
 
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react"
 import {
   balances,
   exactShares,
@@ -13,51 +13,71 @@ import {
   type Person,
   type Session,
   type SplitType,
-} from "@/lib";
+} from "@/lib"
+import { cn } from "@/lib/utils"
+import { BottomNav } from "@/components/BottomNav"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Separator } from "@/components/ui/separator"
 
-const emptySession: Session = { people: [], expenses: [] };
+const emptySession: Session = { people: [], expenses: [] }
+
+const selectClass =
+  "h-11 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 text-base outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 md:h-8 md:text-sm"
 
 function newId(): string {
-  return crypto.randomUUID();
+  return crypto.randomUUID()
 }
 
 function personName(people: Person[], id: string): string {
-  return people.find((p) => p.id === id)?.name ?? id;
+  return people.find((p) => p.id === id)?.name ?? id
 }
 
 function isPersonReferenced(session: Session, personId: string): boolean {
   return session.expenses.some(
     (expense) =>
       expense.paidBy === personId || expense.participantIds.includes(personId),
-  );
+  )
 }
 
 function centsToInput(cents: number): string {
-  const sign = cents < 0 ? "-" : "";
-  const abs = Math.abs(Math.trunc(cents));
-  return `${sign}${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, "0")}`;
+  const sign = cents < 0 ? "-" : ""
+  const abs = Math.abs(Math.trunc(cents))
+  return `${sign}${Math.floor(abs / 100)}.${String(abs % 100).padStart(2, "0")}`
 }
 
 function parseCents(raw: string, allowZero: boolean): number | null {
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
+  const trimmed = raw.trim()
+  if (!trimmed) return null
   try {
-    const cents = toCents(trimmed);
-    if (!Number.isInteger(cents)) return null;
-    if (allowZero ? cents < 0 : cents <= 0) return null;
-    return cents;
+    const cents = toCents(trimmed)
+    if (!Number.isInteger(cents)) return null
+    if (allowZero ? cents < 0 : cents <= 0) return null
+    return cents
   } catch {
-    return null;
+    return null
   }
 }
 
 type ExpenseFormState = {
-  amount: string;
-  paidBy: string;
-  participantIds: string[];
-  splitType: SplitType;
-  exactAmounts: Record<string, string>;
-};
+  amount: string
+  paidBy: string
+  participantIds: string[]
+  splitType: SplitType
+  exactAmounts: Record<string, string>
+}
 
 function emptyForm(): ExpenseFormState {
   return {
@@ -66,14 +86,14 @@ function emptyForm(): ExpenseFormState {
     participantIds: [],
     splitType: "equal",
     exactAmounts: {},
-  };
+  }
 }
 
 function formFromExpense(expense: Expense): ExpenseFormState {
-  const exactAmounts: Record<string, string> = {};
+  const exactAmounts: Record<string, string> = {}
   if (expense.splitType === "exact" && expense.exactCents) {
     for (const [id, cents] of Object.entries(expense.exactCents)) {
-      exactAmounts[id] = centsToInput(cents);
+      exactAmounts[id] = centsToInput(cents)
     }
   }
   return {
@@ -82,109 +102,133 @@ function formFromExpense(expense: Expense): ExpenseFormState {
     participantIds: [...expense.participantIds],
     splitType: expense.splitType,
     exactAmounts,
-  };
+  }
 }
 
-const fieldClass =
-  "rounded border border-zinc-300 bg-white px-2 py-1 text-sm dark:border-zinc-600 dark:bg-zinc-900";
-const btnClass =
-  "rounded border border-zinc-400 px-3 py-1 text-sm dark:border-zinc-500";
+function NetRow({
+  name,
+  net,
+}: {
+  name: string
+  net: number
+}) {
+  const meaning =
+    net > 0 ? "owed (group owes them)" : net < 0 ? "owes" : "settled"
+  return (
+    <li
+      data-testid={`balance-${name}`}
+      className="flex items-center justify-between gap-3 py-1.5"
+    >
+      <span>{name}</span>
+      <span
+        className={cn(
+          "text-sm font-medium",
+          net > 0 && "text-emerald-600 dark:text-emerald-400",
+          net < 0 && "text-red-600 dark:text-red-400",
+          net === 0 && "text-muted-foreground",
+        )}
+      >
+        {formatLkr(net)} — {meaning}
+      </span>
+    </li>
+  )
+}
 
 export function SplitWayApp() {
-  const [session, setSession] = useState<Session>(emptySession);
-  const [name, setName] = useState("");
-  const [form, setForm] = useState<ExpenseFormState>(emptyForm);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [error, setError] = useState("");
+  const [session, setSession] = useState<Session>(emptySession)
+  const [name, setName] = useState("")
+  const [form, setForm] = useState<ExpenseFormState>(emptyForm)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [error, setError] = useState("")
 
   useEffect(() => {
-    setSession(load());
-  }, []);
+    setSession(load())
+  }, [])
 
-  const nets = useMemo(() => balances(session), [session]);
-  const transfers = useMemo(() => settle(nets), [nets]);
-  const netSum = Object.values(nets).reduce((sum, net) => sum + net, 0);
+  const nets = useMemo(() => balances(session), [session])
+  const transfers = useMemo(() => settle(nets), [nets])
+  const netSum = Object.values(nets).reduce((sum, net) => sum + net, 0)
 
   function commit(next: Session) {
-    save(next);
-    setSession(next);
+    save(next)
+    setSession(next)
   }
 
   function addPerson(event: FormEvent) {
-    event.preventDefault();
-    const trimmed = name.trim();
-    if (!trimmed) return;
-    const person: Person = { id: newId(), name: trimmed };
-    commit({ ...session, people: [...session.people, person] });
-    setName("");
+    event.preventDefault()
+    const trimmed = name.trim()
+    if (!trimmed) return
+    const person: Person = { id: newId(), name: trimmed }
+    commit({ ...session, people: [...session.people, person] })
+    setName("")
   }
 
   function removePerson(personId: string) {
-    if (isPersonReferenced(session, personId)) return;
+    if (isPersonReferenced(session, personId)) return
     commit({
       ...session,
       people: session.people.filter((person) => person.id !== personId),
-    });
+    })
   }
 
   function toggleParticipant(personId: string) {
     setForm((current) => {
-      const selected = current.participantIds.includes(personId);
+      const selected = current.participantIds.includes(personId)
       const participantIds = selected
         ? current.participantIds.filter((id) => id !== personId)
-        : [...current.participantIds, personId];
-      const exactAmounts = { ...current.exactAmounts };
-      if (selected) delete exactAmounts[personId];
-      return { ...current, participantIds, exactAmounts };
-    });
+        : [...current.participantIds, personId]
+      const exactAmounts = { ...current.exactAmounts }
+      if (selected) delete exactAmounts[personId]
+      return { ...current, participantIds, exactAmounts }
+    })
   }
 
   function resetExpenseForm() {
-    setForm(emptyForm());
-    setEditingId(null);
-    setError("");
+    setForm(emptyForm())
+    setEditingId(null)
+    setError("")
   }
 
   function startEdit(expense: Expense) {
-    setForm(formFromExpense(expense));
-    setEditingId(expense.id);
-    setError("");
+    setForm(formFromExpense(expense))
+    setEditingId(expense.id)
+    setError("")
   }
 
   function submitExpense(event: FormEvent) {
-    event.preventDefault();
-    setError("");
+    event.preventDefault()
+    setError("")
 
-    const amountCents = parseCents(form.amount, false);
+    const amountCents = parseCents(form.amount, false)
     if (amountCents === null) {
-      setError("Enter a positive amount in LKR.");
-      return;
+      setError("Enter a positive amount in LKR.")
+      return
     }
     if (!form.paidBy) {
-      setError("Select who paid.");
-      return;
+      setError("Select who paid.")
+      return
     }
     if (form.participantIds.length === 0) {
-      setError("Select at least one participant.");
-      return;
+      setError("Select at least one participant.")
+      return
     }
 
-    let exactCents: Record<string, number> | undefined;
+    let exactCents: Record<string, number> | undefined
     if (form.splitType === "exact") {
-      exactCents = {};
+      exactCents = {}
       for (const id of form.participantIds) {
-        const share = parseCents(form.exactAmounts[id] ?? "", true);
+        const share = parseCents(form.exactAmounts[id] ?? "", true)
         if (share === null) {
-          setError("Enter an exact amount for each checked person.");
-          return;
+          setError("Enter an exact amount for each checked person.")
+          return
         }
-        exactCents[id] = share;
+        exactCents[id] = share
       }
       try {
-        exactShares(amountCents, exactCents);
+        exactShares(amountCents, exactCents)
       } catch {
-        setError("Exact amounts must sum to the expense total.");
-        return;
+        setError("Exact amounts must sum to the expense total.")
+        return
       }
     }
 
@@ -195,66 +239,64 @@ export function SplitWayApp() {
       participantIds: [...form.participantIds],
       splitType: form.splitType,
       ...(exactCents ? { exactCents } : {}),
-    };
+    }
 
     const expenses = editingId
       ? session.expenses.map((item) => (item.id === editingId ? expense : item))
-      : [...session.expenses, expense];
+      : [...session.expenses, expense]
 
-    commit({ ...session, expenses });
-    resetExpenseForm();
+    commit({ ...session, expenses })
+    resetExpenseForm()
   }
 
   function deleteExpense(expenseId: string) {
     commit({
       ...session,
       expenses: session.expenses.filter((expense) => expense.id !== expenseId),
-    });
-    if (editingId === expenseId) resetExpenseForm();
+    })
+    if (editingId === expenseId) resetExpenseForm()
   }
 
-  return (
-    <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-10 px-6 py-10">
-      <header>
-        <h1 className="text-3xl font-semibold tracking-tight">SplitWay</h1>
-        <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-          Single-session LKR splitter. Saved in this browser.
-        </p>
-      </header>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold">People</h2>
+  const peopleCard = (
+    <Card id="people" className="scroll-mt-20">
+      <CardHeader>
+        <CardTitle>People</CardTitle>
+        <CardDescription>Add anyone in the group. No login.</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
         <form className="flex flex-wrap items-end gap-2" onSubmit={addPerson}>
-          <label className="flex flex-col gap-1 text-sm">
-            Name
-            <input
-              className={fieldClass}
+          <div className="flex min-w-40 flex-1 flex-col gap-1.5">
+            <Label htmlFor="person-name">Name</Label>
+            <Input
+              id="person-name"
               value={name}
               onChange={(event) => setName(event.target.value)}
               autoComplete="off"
               data-testid="person-name"
+              className="h-11 md:h-8"
             />
-          </label>
-          <button className={btnClass} type="submit" data-testid="person-add">
+          </div>
+          <Button type="submit" data-testid="person-add" className="min-h-11 md:min-h-8">
             Add
-          </button>
+          </Button>
         </form>
         {session.people.length === 0 ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">No people yet.</p>
+          <p className="text-muted-foreground text-sm">No people yet.</p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col">
             {session.people.map((person) => {
-              const referenced = isPersonReferenced(session, person.id);
+              const referenced = isPersonReferenced(session, person.id)
               return (
                 <li
                   key={person.id}
-                  className="flex items-center justify-between gap-3 border-b border-zinc-200 py-1 dark:border-zinc-800"
+                  className="flex min-h-11 items-center justify-between gap-3 border-b last:border-b-0"
                   data-testid={`person-${person.name}`}
                 >
                   <span>{person.name}</span>
-                  <button
-                    className={btnClass}
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     disabled={referenced}
                     data-testid={`person-remove-${person.name}`}
                     title={
@@ -265,33 +307,42 @@ export function SplitWayApp() {
                     onClick={() => removePerson(person.id)}
                   >
                     Remove
-                  </button>
+                  </Button>
                 </li>
-              );
+              )
             })}
           </ul>
         )}
-      </section>
+      </CardContent>
+    </Card>
+  )
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-xl font-semibold">Expenses</h2>
-        <form className="flex flex-col gap-3" onSubmit={submitExpense}>
-          <label className="flex max-w-xs flex-col gap-1 text-sm">
-            Amount (LKR)
-            <input
-              className={fieldClass}
+  const expensesCard = (
+    <Card id="expenses" className="scroll-mt-20">
+      <CardHeader>
+        <CardTitle>Expenses</CardTitle>
+        <CardDescription>Equal split or exact amounts in LKR.</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-4">
+        <form className="flex flex-col gap-4" onSubmit={submitExpense}>
+          <div className="flex max-w-xs flex-col gap-1.5">
+            <Label htmlFor="expense-amount">Amount (LKR)</Label>
+            <Input
+              id="expense-amount"
               inputMode="decimal"
               value={form.amount}
               data-testid="expense-amount"
+              className="h-11 md:h-8"
               onChange={(event) =>
                 setForm((current) => ({ ...current, amount: event.target.value }))
               }
             />
-          </label>
-          <label className="flex max-w-xs flex-col gap-1 text-sm">
-            Payer
+          </div>
+          <div className="flex max-w-xs flex-col gap-1.5">
+            <Label htmlFor="expense-payer">Payer</Label>
             <select
-              className={fieldClass}
+              id="expense-payer"
+              className={selectClass}
               value={form.paidBy}
               data-testid="expense-payer"
               onChange={(event) =>
@@ -305,70 +356,67 @@ export function SplitWayApp() {
                 </option>
               ))}
             </select>
-          </label>
-          <fieldset className="flex flex-col gap-1">
-            <legend className="text-sm">Participants</legend>
+          </div>
+          <fieldset className="flex flex-col gap-2">
+            <legend className="text-sm font-medium">Participants</legend>
             {session.people.length === 0 ? (
-              <p className="text-sm text-zinc-600 dark:text-zinc-400">
+              <p className="text-muted-foreground text-sm">
                 Add people before logging an expense.
               </p>
             ) : (
               session.people.map((person) => (
-                <label key={person.id} className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
+                <label
+                  key={person.id}
+                  className="flex min-h-11 items-center gap-3 text-sm"
+                >
+                  <Checkbox
                     checked={form.participantIds.includes(person.id)}
                     data-testid={`participant-${person.name}`}
-                    onChange={() => toggleParticipant(person.id)}
+                    onCheckedChange={() => toggleParticipant(person.id)}
+                    className="size-5"
                   />
                   {person.name}
                 </label>
               ))
             )}
           </fieldset>
-          <fieldset className="flex flex-col gap-1">
-            <legend className="text-sm">Split type</legend>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="radio"
-                name="splitType"
-                data-testid="split-equal"
-                checked={form.splitType === "equal"}
-                onChange={() =>
-                  setForm((current) => ({ ...current, splitType: "equal" }))
-                }
-              />
-              Equal
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="radio"
-                name="splitType"
-                data-testid="split-exact"
-                checked={form.splitType === "exact"}
-                onChange={() =>
-                  setForm((current) => ({ ...current, splitType: "exact" }))
-                }
-              />
-              Exact
-            </label>
+          <fieldset className="flex flex-col gap-2">
+            <legend className="mb-1 text-sm font-medium">Split type</legend>
+            <RadioGroup
+              value={form.splitType}
+              onValueChange={(value) =>
+                setForm((current) => ({
+                  ...current,
+                  splitType: value as SplitType,
+                }))
+              }
+            >
+              <label className="flex min-h-11 items-center gap-3 text-sm">
+                <RadioGroupItem value="equal" data-testid="split-equal" className="size-5" />
+                Equal
+              </label>
+              <label className="flex min-h-11 items-center gap-3 text-sm">
+                <RadioGroupItem value="exact" data-testid="split-exact" className="size-5" />
+                Exact
+              </label>
+            </RadioGroup>
           </fieldset>
           {form.splitType === "exact" && (
-            <fieldset className="flex flex-col gap-2">
-              <legend className="text-sm">Exact amounts (LKR)</legend>
+            <fieldset className="flex flex-col gap-3">
+              <legend className="text-sm font-medium">Exact amounts (LKR)</legend>
               {form.participantIds.length === 0 ? (
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                <p className="text-muted-foreground text-sm">
                   Check participants to enter their amounts.
                 </p>
               ) : (
                 form.participantIds.map((id) => (
-                  <label key={id} className="flex max-w-xs flex-col gap-1 text-sm">
-                    {personName(session.people, id)}
-                    <input
-                      className={fieldClass}
+                  <div key={id} className="flex max-w-xs flex-col gap-1.5">
+                    <Label>{personName(session.people, id)}</Label>
+                    <Input
                       inputMode="decimal"
                       data-testid={`exact-${personName(session.people, id)}`}
                       value={form.exactAmounts[id] ?? ""}
+                      className="h-11 md:h-8"
                       onChange={(event) =>
                         setForm((current) => ({
                           ...current,
@@ -379,44 +427,44 @@ export function SplitWayApp() {
                         }))
                       }
                     />
-                  </label>
+                  </div>
                 ))
               )}
             </fieldset>
           )}
           {error ? (
-            <p className="text-sm text-red-700 dark:text-red-400" data-testid="form-error">
-              {error}
-            </p>
+            <Alert variant="destructive" data-testid="form-error">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           ) : null}
           <div className="flex gap-2">
-            <button className={btnClass} type="submit" data-testid="expense-submit">
+            <Button type="submit" data-testid="expense-submit" className="min-h-11 md:min-h-8">
               {editingId ? "Save expense" : "Add expense"}
-            </button>
+            </Button>
             {editingId ? (
-              <button className={btnClass} type="button" onClick={resetExpenseForm}>
+              <Button type="button" variant="outline" onClick={resetExpenseForm}>
                 Cancel
-              </button>
+              </Button>
             ) : null}
           </div>
         </form>
+        <Separator />
         {session.expenses.length === 0 ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">No expenses yet.</p>
+          <p className="text-muted-foreground text-sm">No expenses yet.</p>
         ) : (
           <ul className="flex flex-col gap-3">
             {session.expenses.map((expense) => (
               <li
                 key={expense.id}
-                className="flex flex-wrap items-start justify-between gap-3 border border-zinc-200 p-3 dark:border-zinc-800"
+                className="flex flex-wrap items-start justify-between gap-3 rounded-lg border p-3"
                 data-testid={`expense-${expense.id}`}
               >
                 <div className="text-sm">
                   <p>
                     {formatLkr(expense.amountCents)} paid by{" "}
-                    {personName(session.people, expense.paidBy)} ({expense.splitType}
-                    )
+                    {personName(session.people, expense.paidBy)} ({expense.splitType})
                   </p>
-                  <p className="text-zinc-600 dark:text-zinc-400">
+                  <p className="text-muted-foreground">
                     Participants:{" "}
                     {expense.participantIds
                       .map((id) => personName(session.people, id))
@@ -424,72 +472,115 @@ export function SplitWayApp() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button
-                    className={btnClass}
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     data-testid={`expense-edit-${expense.id}`}
                     onClick={() => startEdit(expense)}
                   >
                     Edit
-                  </button>
-                  <button
-                    className={btnClass}
+                  </Button>
+                  <Button
                     type="button"
+                    variant="outline"
+                    size="sm"
                     data-testid={`expense-delete-${expense.id}`}
                     onClick={() => deleteExpense(expense.id)}
                   >
                     Delete
-                  </button>
+                  </Button>
                 </div>
               </li>
             ))}
           </ul>
         )}
-      </section>
+      </CardContent>
+    </Card>
+  )
 
-      <section className="flex flex-col gap-3" data-testid="balances">
-        <h2 className="text-xl font-semibold">Balances</h2>
+  const balancesCard = (
+    <Card id="balances" className="scroll-mt-20" data-testid="balances">
+      <CardHeader>
+        <CardTitle>Balances</CardTitle>
+        <CardDescription>Net owed or owing, in LKR.</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
         {session.people.length === 0 ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">No balances yet.</p>
+          <p className="text-muted-foreground text-sm">No balances yet.</p>
         ) : (
-          <ul className="flex flex-col gap-1 text-sm">
-            {session.people.map((person) => {
-              const net = nets[person.id] ?? 0;
-              const meaning =
-                net > 0 ? "owed (group owes them)" : net < 0 ? "owes" : "settled";
-              return (
-                <li key={person.id} data-testid={`balance-${person.name}`}>
-                  {person.name}: {formatLkr(net)} — {meaning}
-                </li>
-              );
-            })}
+          <ul className="flex flex-col">
+            {session.people.map((person) => (
+              <NetRow
+                key={person.id}
+                name={person.name}
+                net={nets[person.id] ?? 0}
+              />
+            ))}
           </ul>
         )}
-        <p className="text-sm" data-testid="balance-sum">
+        <p className="text-sm font-medium" data-testid="balance-sum">
           Sum: {formatLkr(netSum)}
         </p>
-      </section>
+      </CardContent>
+    </Card>
+  )
 
-      <section className="flex flex-col gap-3" data-testid="settle-up">
-        <h2 className="text-xl font-semibold">Settle Up</h2>
+  const settleCard = (
+    <Card id="settle" className="scroll-mt-20" data-testid="settle-up">
+      <CardHeader>
+        <CardTitle>Settle Up</CardTitle>
+        <CardDescription>Fewest payments to zero every net.</CardDescription>
+      </CardHeader>
+      <CardContent>
         {transfers.length === 0 ? (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="text-muted-foreground text-sm">
             Everyone is at {formatLkr(0)}.
           </p>
         ) : (
-          <ul className="flex flex-col gap-1 text-sm">
+          <ul className="flex flex-col gap-2">
             {transfers.map((transfer) => (
               <li
                 key={`${transfer.from}-${transfer.to}-${transfer.amountCents}`}
                 data-testid="settle-row"
+                className="flex min-h-11 items-center justify-between gap-3 text-sm"
               >
-                {personName(session.people, transfer.from)} pays{" "}
-                {personName(session.people, transfer.to)} {formatLkr(transfer.amountCents)}
+                <span>
+                  {personName(session.people, transfer.from)} →{" "}
+                  {personName(session.people, transfer.to)}
+                </span>
+                <Badge variant="secondary">{formatLkr(transfer.amountCents)}</Badge>
               </li>
             ))}
           </ul>
         )}
-      </section>
-    </main>
-  );
+      </CardContent>
+    </Card>
+  )
+
+  return (
+    <>
+      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col pb-24 md:pb-8">
+        <header
+          className="bg-background/95 supports-backdrop-filter:bg-background/80 sticky top-0 z-20 border-b px-4 py-3 backdrop-blur md:px-6"
+          style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
+        >
+          <h1 className="text-2xl font-semibold tracking-tight">SplitWay</h1>
+          <p className="text-muted-foreground text-sm">Saved in this browser.</p>
+        </header>
+
+        <main className="flex flex-col gap-4 px-4 py-4 md:grid md:grid-cols-2 md:items-start md:gap-6 md:px-6 md:py-6">
+          <div className="flex flex-col gap-4">
+            {peopleCard}
+            {expensesCard}
+          </div>
+          <div className="flex flex-col gap-4 md:sticky md:top-20">
+            {balancesCard}
+            {settleCard}
+          </div>
+        </main>
+      </div>
+      <BottomNav />
+    </>
+  )
 }

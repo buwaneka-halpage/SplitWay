@@ -14,7 +14,8 @@ async function setParticipants(page: Page, names: string[]) {
     const id = (await box.getAttribute("data-testid")) ?? ""
     const name = id.replace("participant-", "")
     const should = names.includes(name)
-    if (should !== (await box.isChecked())) await box.click()
+    const on = (await box.getAttribute("aria-checked")) === "true" || (await box.isChecked().catch(() => false))
+    if (should !== on) await box.click()
   }
 }
 
@@ -35,14 +36,14 @@ test("AT-01: Alice Bob Carol Dave balances sum to zero and settle-up is minimize
   await page.getByTestId("expense-amount").fill("12000")
   await page.getByTestId("expense-payer").selectOption({ label: "Alice" })
   await setParticipants(page, ["Alice", "Bob", "Carol", "Dave"])
-  await page.getByTestId("split-equal").check()
+  await page.getByTestId("split-equal").click()
   await page.getByTestId("expense-submit").click()
   await expect(page.getByText("Rs. 12,000.00 paid by Alice")).toBeVisible()
 
   await page.getByTestId("expense-amount").fill("10000")
   await page.getByTestId("expense-payer").selectOption({ label: "Carol" })
   await setParticipants(page, ["Alice", "Bob", "Dave"])
-  await page.getByTestId("split-exact").check()
+  await page.getByTestId("split-exact").click()
   await page.getByTestId("exact-Alice").fill("3333.33")
   await page.getByTestId("exact-Bob").fill("3333.33")
   await page.getByTestId("exact-Dave").fill("3333.34")
@@ -52,7 +53,7 @@ test("AT-01: Alice Bob Carol Dave balances sum to zero and settle-up is minimize
   await page.getByTestId("expense-amount").fill("6000")
   await page.getByTestId("expense-payer").selectOption({ label: "Dave" })
   await setParticipants(page, ["Dave", "Bob"])
-  await page.getByTestId("split-equal").check()
+  await page.getByTestId("split-equal").click()
   await page.getByTestId("expense-submit").click()
   await expect(page.getByText("Rs. 6,000.00 paid by Dave")).toBeVisible()
 
@@ -81,9 +82,9 @@ test("exact amounts that do not sum are rejected and not saved", async ({ page }
   await addPerson(page, "Bea")
   await page.getByTestId("expense-amount").fill("100")
   await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
-  await page.getByTestId("participant-Ann").check()
-  await page.getByTestId("participant-Bea").check()
-  await page.getByTestId("split-exact").check()
+  await page.getByTestId("participant-Ann").click()
+  await page.getByTestId("participant-Bea").click()
+  await page.getByTestId("split-exact").click()
   await page.getByTestId("exact-Ann").fill("40")
   await page.getByTestId("exact-Bea").fill("40")
   await page.getByTestId("expense-submit").click()
@@ -98,8 +99,8 @@ test("edit and delete recalculate balances; reload restores the session", async 
   await addPerson(page, "Bea")
   await page.getByTestId("expense-amount").fill("100")
   await page.getByTestId("expense-payer").selectOption({ label: "Ann" })
-  await page.getByTestId("participant-Ann").check()
-  await page.getByTestId("participant-Bea").check()
+  await page.getByTestId("participant-Ann").click()
+  await page.getByTestId("participant-Bea").click()
   await page.getByTestId("expense-submit").click()
   await expect(page.getByTestId("balance-Ann")).toContainText("Rs. 50.00")
 

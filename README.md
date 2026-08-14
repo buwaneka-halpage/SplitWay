@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). On a phone, open that URL in the browser and use Add to Home Screen — SplitWay installs as a standalone app (PWA).
+Open [http://localhost:3000](http://localhost:3000). Live: [https://splitway-five.vercel.app](https://splitway-five.vercel.app).
 
 Engine tests, including acceptance scenario AT-01 (Alice, Bob, Carol, Dave):
 
@@ -52,11 +52,18 @@ npm run test:e2e
 
 Money is never added or compared as IEEE-754 rupee floats. An equal split floors each share (`floor(totalCents / n)`), then gives the leftover cents (`totalCents % n`) out one at a time by largest remainder, with ties broken by stable sorted person id. Example: Rs. 100.00 is 10000 cents among 3 people. Base share is 3333 cents; leftover is 1 cent. The shares are 3334, 3333, 3333 in deterministic id order. Sum is 10000 cents (Rs. 100.00), not 9999 or 10001. Exact-amount shares must already sum to the total or the log/edit is rejected.
 
+## Install on a phone
+
+The app is a PWA (`display: standalone`). Session data stays in `localStorage` on that device — installing or opening it on another phone starts a separate session.
+
+1. Open the site in Safari (iOS) or Chrome (Android).
+2. iOS: Share → Add to Home Screen. Android: menu → Install app / Add to Home Screen.
+3. Launch from the home-screen icon. It runs without the browser chrome.
+
 ## What was left incomplete
 
 Correctness of shares, nets, and settle-up was prioritized over covering every extra feature.
 
-- **UI polish** is out of scope. The page is usable (people → expenses → balances → settle up) on a desktop browser. Mobile layout and visual design were not the goal.
 - **Percentage split** was not built. Exact amount covers the second required split type.
 - **Bonus invalid-total handling** (percentages ≠ 100%, or silently fixing exact amounts that do not sum) was skipped. Exact mismatches fail closed so a bad row cannot quietly unbalance the session.
 
@@ -66,5 +73,4 @@ With more time, in this order:
 
 1. Percentage split, still in integer cents, with a clear reject (or an explicit leftover rule) when weights do not sum to 100%.
 2. A better exact-split error in the UI when cents do not sum to the total, without changing the fail-closed engine.
-3. Mobile layout and small UX cleanup (the flow is already there).
-4. Only after that: optional export/import of the session JSON. Still no accounts.
+3. Optional export/import of the session JSON. Still no accounts.
