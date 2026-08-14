@@ -12,7 +12,7 @@ export function SettlePanel() {
   const transfers = useMemo(() => settle(nets), [nets])
 
   return (
-    <section className="flex flex-col gap-4 px-4 py-4" data-testid="settle-up">
+    <section className="flex flex-col gap-4 px-4 py-4 md:max-w-2xl md:px-8 md:py-6" data-testid="settle-up">
       <h2 className="text-lg font-semibold">Settle Up</h2>
       {transfers.length === 0 ? (
         <p className="text-sm text-muted-foreground">Everyone is at {formatLkr(0)}.</p>

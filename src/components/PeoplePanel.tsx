@@ -31,7 +31,7 @@ export function PeoplePanel() {
   }
 
   return (
-    <section className="flex flex-col gap-4 px-4 py-4">
+    <section className="flex flex-col gap-4 px-4 py-4 md:max-w-2xl md:px-8 md:py-6">
       <h2 className="text-lg font-semibold">People</h2>
       <form className="flex gap-2" onSubmit={addPerson}>
         <div className="min-w-0 flex-1">
@@ -40,7 +40,7 @@ export function PeoplePanel() {
           </Label>
           <Input
             id="person-name"
-            className="h-11 text-base"
+            className="h-11 text-base md:h-9 md:text-sm"
             value={name}
             onChange={(event) => setName(event.target.value)}
             autoComplete="off"
@@ -48,7 +48,7 @@ export function PeoplePanel() {
             data-testid="person-name"
           />
         </div>
-        <Button className="h-11 px-4" type="submit" data-testid="person-add">
+        <Button className="h-11 px-4 md:h-9" type="submit" data-testid="person-add">
           Add
         </Button>
       </form>

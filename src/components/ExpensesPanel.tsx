@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 type ExpenseFormState = {
   amount: string
+  description: string
   paidBy: string
   participantIds: string[]
   splitType: SplitType
@@ -21,6 +22,7 @@ type ExpenseFormState = {
 function emptyForm(): ExpenseFormState {
   return {
     amount: "",
+    description: "",
     paidBy: "",
     participantIds: [],
     splitType: "equal",
@@ -28,7 +30,7 @@ function emptyForm(): ExpenseFormState {
   }
 }
 
-const fieldClass = "h-11 text-base"
+const fieldClass = "h-11 text-base md:h-9 md:text-sm"
 
 export function ExpensesPanel() {
   const { group, commit } = useGroup()
@@ -97,12 +99,14 @@ export function ExpensesPanel() {
       }
     }
 
+    const description = form.description.trim()
     const expense: Expense = {
       id: editingId ?? newId(),
       amountCents,
       paidBy: form.paidBy,
       participantIds: [...form.participantIds],
       splitType: form.splitType,
+      ...(description ? { description } : {}),
       ...(exactCents ? { exactCents } : {}),
     }
 
@@ -123,9 +127,9 @@ export function ExpensesPanel() {
   }
 
   return (
-    <section className="flex flex-col gap-4 px-4 py-4">
-      <h2 className="text-lg font-semibold">Expenses</h2>
-      <form className="flex flex-col gap-3" onSubmit={submitExpense}>
+    <section className="flex flex-col gap-4 px-4 py-4 md:grid md:grid-cols-[minmax(18rem,22rem)_1fr] md:items-start md:gap-8 md:px-8 md:py-6">
+      <h2 className="text-lg font-semibold md:col-span-2">Expenses</h2>
+      <form className="flex flex-col gap-3 md:sticky md:top-4" onSubmit={submitExpense}>
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="expense-amount">Amount (LKR)</Label>
           <Input
@@ -136,6 +140,20 @@ export function ExpensesPanel() {
             data-testid="expense-amount"
             onChange={(event) =>
               setForm((current) => ({ ...current, amount: event.target.value }))
+            }
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="expense-description">Description</Label>
+          <Input
+            id="expense-description"
+            className={fieldClass}
+            value={form.description}
+            placeholder="Dinner, hotel, fuel…"
+            autoComplete="off"
+            data-testid="expense-description"
+            onChange={(event) =>
+              setForm((current) => ({ ...current, description: event.target.value }))
             }
           />
         </div>
@@ -249,11 +267,11 @@ export function ExpensesPanel() {
           </p>
         ) : null}
         <div className="flex gap-2">
-          <Button className="h-11" type="submit" data-testid="expense-submit">
+          <Button className="h-11 md:h-9" type="submit" data-testid="expense-submit">
             {editingId ? "Save expense" : "Add expense"}
           </Button>
           {editingId ? (
-            <Button className="h-11" variant="outline" type="button" onClick={resetExpenseForm}>
+            <Button className="h-11 md:h-9" variant="outline" type="button" onClick={resetExpenseForm}>
               Cancel
             </Button>
           ) : null}
@@ -268,7 +286,12 @@ export function ExpensesPanel() {
               <Card size="sm">
                 <CardContent className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-medium">
+                    {expense.description ? (
+                      <p className="font-medium" data-testid={`expense-desc-${expense.id}`}>
+                        {expense.description}
+                      </p>
+                    ) : null}
+                    <p className={expense.description ? "text-muted-foreground" : "font-medium"}>
                       {formatLkr(expense.amountCents)} paid by{" "}
                       {personName(group.people, expense.paidBy)} ({expense.splitType})
                     </p>

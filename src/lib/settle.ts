@@ -22,6 +22,10 @@ export function settle(nets: Record<PersonId, number>): Transfer[] {
   return transfers
 }
 
+export function transferKey(t: Transfer): string {
+  return `${t.from}\0${t.to}\0${t.amountCents}`
+}
+
 function pick(
   remaining: Record<PersonId, number>,
   role: "debtor" | "creditor",
