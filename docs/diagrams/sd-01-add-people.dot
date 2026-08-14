@@ -1,0 +1,105 @@
+digraph "SD-01 Add people" {
+  graph [label="SD-01 Add people", labelloc=t, fontname="Helvetica", fontsize=16, rankdir=TB, splines=line, newrank=true, compound=true, pad=0.6, bgcolor=white, nodesep=2.4, ranksep=0.42, ordering=out];
+  node [fontname="Helvetica"];
+  edge [fontname="Helvetica", fontsize=9];
+
+  // participants
+  H_User [label="User", shape=box, style="rounded,filled", fillcolor="#ECEFF1", color="#37474F", fontsize=12, width=1.7, height=0.5, group=User];
+  H_UI [label="UI", shape=box, style="rounded,filled", fillcolor="#E3F2FD", color="#37474F", fontsize=12, width=1.7, height=0.5, group=UI];
+  H_SessionStore [label="SessionStore", shape=box, style="rounded,filled", fillcolor="#FFF3E0", color="#37474F", fontsize=12, width=1.7, height=0.5, group=SessionStore];
+  { rank=same; H_User H_UI H_SessionStore; }
+  edge [style=invis, weight=20];
+  H_User -> H_UI -> H_SessionStore;
+
+  // lifeline points / self actions
+  n_User_0 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_0 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_0 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_0 n_UI_0 n_SessionStore_0; }
+  n_User_1 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_1 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_1 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_1 n_UI_1 n_SessionStore_1; }
+  n_User_2 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_2 [label="new Person{id, name}", shape=box, style="rounded,filled", fillcolor="#FFF8E1", color="#F9A825", fontsize=8, width=1.5, height=0.32, group=UI];
+  n_SessionStore_2 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_2 n_UI_2 n_SessionStore_2; }
+  n_User_3 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_3 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_3 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_3 n_UI_3 n_SessionStore_3; }
+  n_User_4 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_4 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_4 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_4 n_UI_4 n_SessionStore_4; }
+  n_User_5 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_5 [label="people.push(person)", shape=box, style="rounded,filled", fillcolor="#FFF8E1", color="#F9A825", fontsize=8, width=1.5, height=0.32, group=UI];
+  n_SessionStore_5 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_5 n_UI_5 n_SessionStore_5; }
+  n_User_6 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_6 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_6 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_6 n_UI_6 n_SessionStore_6; }
+  n_User_7 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_7 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_7 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_7 n_UI_7 n_SessionStore_7; }
+  n_User_8 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=User];
+  n_UI_8 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=UI];
+  n_SessionStore_8 [label="", shape=point, width=0.08, height=0.08, style=filled, fillcolor="#546E7A", color="#546E7A", group=SessionStore];
+  { rank=same; n_User_8 n_UI_8 n_SessionStore_8; }
+
+  F_User [label="User", shape=box, style="rounded,filled", fillcolor="#ECEFF1", color="#37474F", fontsize=11, width=1.7, height=0.4, group=User];
+  F_UI [label="UI", shape=box, style="rounded,filled", fillcolor="#E3F2FD", color="#37474F", fontsize=11, width=1.7, height=0.4, group=UI];
+  F_SessionStore [label="SessionStore", shape=box, style="rounded,filled", fillcolor="#FFF3E0", color="#37474F", fontsize=11, width=1.7, height=0.4, group=SessionStore];
+  { rank=same; F_User F_UI F_SessionStore; }
+
+  // lifelines
+  edge [style=dashed, color="#90A4AE", dir=none, weight=100, penwidth=1.6, constraint=true];
+  H_User -> n_User_0 -> n_User_1 -> n_User_2 -> n_User_3 -> n_User_4 -> n_User_5 -> n_User_6 -> n_User_7 -> n_User_8 -> F_User;
+  H_UI -> n_UI_0 -> n_UI_1 -> n_UI_2 -> n_UI_3 -> n_UI_4 -> n_UI_5 -> n_UI_6 -> n_UI_7 -> n_UI_8 -> F_UI;
+  H_SessionStore -> n_SessionStore_0 -> n_SessionStore_1 -> n_SessionStore_2 -> n_SessionStore_3 -> n_SessionStore_4 -> n_SessionStore_5 -> n_SessionStore_6 -> n_SessionStore_7 -> n_SessionStore_8 -> F_SessionStore;
+
+  // messages
+  n_User_0 -> n_UI_0 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="Add(name)", fontcolor="#212121"];
+  n_UI_1 -> n_User_1 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="reject", fontcolor="#37474F"];
+  n_UI_3 -> n_SessionStore_3 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="load()", fontcolor="#212121"];
+  n_SessionStore_4 -> n_UI_4 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="Session", fontcolor="#37474F"];
+  n_UI_6 -> n_SessionStore_6 [style=solid, color="#212121", arrowhead=vee, arrowsize=0.85, constraint=false, label="save(session)", fontcolor="#212121"];
+  n_SessionStore_7 -> n_UI_7 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="ok", fontcolor="#37474F"];
+  n_UI_8 -> n_User_8 [style=dashed, color="#546E7A", arrowhead=open, arrowsize=0.8, constraint=false, label="people list updated", fontcolor="#37474F"];
+
+  // combined fragments (UML alt / opt / loop)
+  n_User_0;
+  n_UI_0;
+  n_SessionStore_0;
+  subgraph cluster_0 {
+    label="opt [name empty]";
+    fontsize=10; fontname="Helvetica"; fontcolor="#F9A825";
+    style="rounded,dashed"; color="#F9A825"; bgcolor="#FFF8E1"; margin=12;
+    n_User_1;
+    n_UI_1;
+    n_SessionStore_1;
+  }
+  n_User_2;
+  n_UI_2;
+  n_SessionStore_2;
+  n_User_3;
+  n_UI_3;
+  n_SessionStore_3;
+  n_User_4;
+  n_UI_4;
+  n_SessionStore_4;
+  n_User_5;
+  n_UI_5;
+  n_SessionStore_5;
+  n_User_6;
+  n_UI_6;
+  n_SessionStore_6;
+  n_User_7;
+  n_UI_7;
+  n_SessionStore_7;
+  n_User_8;
+  n_UI_8;
+  n_SessionStore_8;
+}
